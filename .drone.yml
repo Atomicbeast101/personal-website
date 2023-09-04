@@ -1,0 +1,167 @@
+---
+kind: pipeline
+type: docker
+name: Test
+
+trigger:
+  branch:
+    - test
+
+steps:
+  - name: Build&Deploy to Test Site
+    image: plugins/ansible:3
+    environment:
+      NEXTCLOUD_WEBDEV_URL:
+        from_secret: nextcloud_webdev_url
+      NEXTCLOUD_USER:
+        from_secret: nextcloud_user
+      NEXTCLOUD_API_TOKEN:
+        from_secret: nextcloud_api_token
+      HOSTNAME:
+        from_secret: TEST_site_hostname
+      HUGO_BASEURL: 
+        from_secret: TEST_site_base_url
+      HUGO_TITLE: 
+        from_secret: site_full_name
+      NEXTCLOUD_PATH_RESUME_FILENAME:
+        from_secret: nextcloud_path_resume_filename
+      HUGO_PARAMS_AUTHOR: 
+        from_secret: site_full_name
+      HUGO_PARAMS_DESCRIPTION: 
+        from_secret: site_description
+      HUGO_PARAMS_KEYWORDS: 
+        from_secret: blog,personal,devops,systems,administrator,network,networking
+      HUGO_PARAMS_INFO: Network/DevOps Engineer
+      HUGO_PARAMS_AVATARURL: images/logo.jpg
+      HUGO_PARAMS_COLORSCHEME: dark
+      HUGO_PARAMS_UMAMI_ENABLED: true
+      HUGO_PARAMS_UMAMI_WEBSITEID: 
+        from_secret: TEST_site_umami_websiteid
+      HUGO_PARAMS_UMAMI_JSLOCATION: 
+        from_secret: site_umami_jslocation
+      HUGO_SOCIAL_EMAIL: 
+        from_secret: site_email_address
+      HUGO_SOCIAL_LINKEDIN: 
+        from_secret: site_linkedin_url
+      HUGO_SOCIAL_GITHUB: 
+        from_secret: site_github_url
+      ANSIBLE_SUDO_PASS:
+        from_secret: vps_password
+    settings:
+      playbook: devops/playbook.yml
+      inventory: devops/inventory
+      private_key:
+        from_secret: vps_public_key
+      ssh_extra_args: "-o StrictHostKeyChecking=no"
+
+  - name: Notify Developer of Pipeline Status
+    image: plugins/webhook
+    settings:
+      urls:
+        from_secret: gotify_endpoint
+      content_type: application/json
+      template: >
+        {{#success build.status}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[SUCCESS] Updated TEST personal site!"
+          }
+        {{else}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[FAILED] Unable to update TEST personal site!"
+          }
+        {{/success}}
+    depends_on:
+      - Build&Deploy to Test Site
+    when:
+      status:
+        - success
+        - failure
+
+---
+kind: pipeline
+type: docker
+name: Production
+
+trigger:
+  event:
+    - promote
+  branch:
+    - main
+
+steps:
+  - name: Build&Deploy to Prod Site
+    image: plugins/ansible:3
+    environment:
+      NEXTCLOUD_WEBDEV_URL:
+        from_secret: nextcloud_webdev_url
+      NEXTCLOUD_USER:
+        from_secret: nextcloud_user
+      NEXTCLOUD_API_TOKEN:
+        from_secret: nextcloud_api_token
+      HOSTNAME:
+        from_secret: PROD_site_hostname
+      HUGO_BASEURL: 
+        from_secret: PROD_site_base_url
+      HUGO_TITLE: 
+        from_secret: site_full_name
+      NEXTCLOUD_PATH_RESUME_FILENAME:
+        from_secret: nextcloud_path_resume_filename
+      HUGO_PARAMS_AUTHOR: 
+        from_secret: site_full_name
+      HUGO_PARAMS_DESCRIPTION: 
+        from_secret: site_description
+      HUGO_PARAMS_KEYWORDS: 
+        from_secret: blog,personal,devops,systems,administrator,network,networking
+      HUGO_PARAMS_INFO: Network/DevOps Engineer
+      HUGO_PARAMS_AVATARURL: images/logo.jpg
+      HUGO_PARAMS_COLORSCHEME: dark
+      HUGO_PARAMS_UMAMI_ENABLED: true
+      HUGO_PARAMS_UMAMI_WEBSITEID: 
+        from_secret: TEST_site_umami_websiteid
+      HUGO_PARAMS_UMAMI_JSLOCATION: 
+        from_secret: site_umami_jslocation
+      HUGO_SOCIAL_EMAIL: 
+        from_secret: site_email_address
+      HUGO_SOCIAL_LINKEDIN: 
+        from_secret: site_linkedin_url
+      HUGO_SOCIAL_GITHUB: 
+        from_secret: site_github_url
+      ANSIBLE_SUDO_PASS:
+        from_secret: vps_password
+    settings:
+      playbook: devops/playbook.yml
+      inventory: devops/inventory
+      private_key:
+        from_secret: vps_public_key
+      ssh_extra_args: "-o StrictHostKeyChecking=no"
+
+  - name: Notify Developer of Pipeline Status
+    image: plugins/webhook
+    settings:
+      urls:
+        from_secret: gotify_endpoint
+      content_type: application/json
+      template: >
+        {{#success build.status}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[SUCCESS] Updated PROD personal site!"
+          }
+        {{else}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[FAILED] Unable to update PROD personal site!"
+          }
+        {{/success}}
+    depends_on:
+      - Build&Deploy to Prod Site
+    when:
+      status:
+        - success
+        - failure
