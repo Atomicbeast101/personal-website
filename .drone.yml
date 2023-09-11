@@ -17,6 +17,7 @@ steps:
         from_secret: nextcloud_user
       NEXTCLOUD_API_TOKEN:
         from_secret: nextcloud_api_token
+      GITHUB_BRANCH: test
       HOSTNAME:
         from_secret: TEST_site_hostname
       HUGO_BASEURL: 
@@ -102,6 +103,7 @@ steps:
         from_secret: nextcloud_user
       NEXTCLOUD_API_TOKEN:
         from_secret: nextcloud_api_token
+      GITHUB_BRANCH: main
       HOSTNAME:
         from_secret: PROD_site_hostname
       HUGO_BASEURL: 
