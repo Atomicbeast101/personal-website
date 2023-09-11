@@ -89,6 +89,8 @@ name: Production
 trigger:
   branch:
     - main
+  event:
+    - pull_request
 
 steps:
   - name: Build&Deploy to Prod Site
