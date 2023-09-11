@@ -52,7 +52,7 @@
 
     - name: Clone git repository
       git:
-        repo: 'https://gitea.potatolab.dev/adam/personal-website.git'
+        repo: "{{ lookup('env', 'GITEA_REPO') }}"
         dest: /tmp/site
         version: test
       environment:
