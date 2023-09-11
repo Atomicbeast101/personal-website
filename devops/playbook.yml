@@ -54,7 +54,7 @@
       git:
         repo: https://github.com/Atomicbeast101/personal-website.git
         dest: /tmp/site
-        version: "{{ lookup('env', 'GITHUB_BRANCH') }}"
+        version: "{{ lookup('env', 'DRONE_BRANCH') }}"
 
     - name: Create necessary folders
       file:
