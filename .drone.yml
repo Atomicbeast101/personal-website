@@ -88,8 +88,6 @@ type: docker
 name: Production
 
 trigger:
-  event:
-    - promote
   branch:
     - main
 
@@ -123,7 +121,7 @@ steps:
       HUGO_PARAMS_COLORSCHEME: dark
       HUGO_PARAMS_UMAMI_ENABLED: true
       HUGO_PARAMS_UMAMI_WEBSITEID: 
-        from_secret: TEST_site_umami_websiteid
+        from_secret: PROD_site_umami_websiteid
       HUGO_PARAMS_UMAMI_JSLOCATION: 
         from_secret: site_umami_jslocation
       HUGO_SOCIAL_EMAIL: 
