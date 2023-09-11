@@ -55,6 +55,8 @@
         repo: 'https://gitea.potatolab.dev/adam/personal-website.git'
         dest: /tmp/site
         version: test
+      environment:
+        - GIT_SSL_NO_VERIFY: "true"
 
     - name: Create necessary folders
       file:
