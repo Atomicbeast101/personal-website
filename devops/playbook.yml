@@ -52,11 +52,9 @@
 
     - name: Clone git repository
       git:
-        repo: "{{ lookup('env', 'GITEA_REPO') }}"
+        repo: https://github.com/Atomicbeast101/personal-website.git
         dest: /tmp/site
         version: test
-      environment:
-        - GIT_SSL_NO_VERIFY: "true"
 
     - name: Create necessary folders
       file:
