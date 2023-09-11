@@ -88,8 +88,6 @@ type: docker
 name: Production
 
 trigger:
-  event:
-    - promote
   branch:
     - main
 
