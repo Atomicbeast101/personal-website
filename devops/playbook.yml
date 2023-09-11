@@ -44,11 +44,17 @@
         mode: '0755'
         state: directory
 
-    - name: Copy following directories to /tmp/site
-      copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      with_items: "{{ hugo_contents }}"
+    # - name: Copy following directories to /tmp/site
+    #   copy:
+    #     src: "{{ item.src }}"
+    #     dest: "{{ item.dest }}"
+    #   with_items: "{{ hugo_contents }}"
+
+    - name: Clone git repository
+      git:
+        repo: https://github.com/Atomicbeast101/personal-website.git
+        dest: /tmp/site
+        version: "{{ lookup('env', 'GITHUB_BRANCH') }}"
 
     - name: Create necessary folders
       file:
