@@ -6,6 +6,8 @@ name: Test
 trigger:
   branch:
     - test
+  event:
+    - push
 
 steps:
   - name: Build&Deploy to Test Site
@@ -90,7 +92,7 @@ trigger:
   branch:
     - main
   event:
-    - pull_request
+    - push
 
 steps:
   - name: Build&Deploy to Prod Site
