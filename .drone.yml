@@ -26,8 +26,8 @@ steps:
     commands:
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
-      - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
-      - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
+      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
+      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" ~/static/images/
 
   - name: Test
     image: rclone/rclone
