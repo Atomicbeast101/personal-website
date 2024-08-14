@@ -24,7 +24,7 @@ steps:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
-      - rclone lsf cloud:/dav/files/adam
+      - rclone lsf cloud:/
       # - mkdir -p ~/static/pdf
       # - mkdir -p ~/static/images
       # - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
