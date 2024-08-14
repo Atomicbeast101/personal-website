@@ -32,7 +32,7 @@ steps:
       - rclone config password PrivateCloud pass $CLOUD_PASSWORD
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
-      - rclone config show PrivateCloud
+      - rclone lsf PrivateCloud:/
       - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
       - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
