@@ -28,9 +28,10 @@ steps:
       - echo "user = $CLOUD_USERNAME" >> /config/rclone/rclone.conf
       - echo "pass = REPLACED_BY_NEXT_CMD" >> /config/rclone/rclone.conf
       - rclone config password PrivateCloud pass $CLOUD_PASSWORD
-      - ls -ls
-      # - rclone copy PrivateCloud:"/Documents/Job Applications/${CLOUD_PATH_RESUME_FILENAME}" "/tmp/static/pdf"
-      # - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" "/tmp/static/images/"
+      - mkdir -p ~/static/pdf
+      - mkdir -p ~/static/images
+      - rclone copy PrivateCloud:"/Documents/Job Applications/${CLOUD_PATH_RESUME_FILENAME}" ~/static/pdf
+      - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
   # - name: Build&Push Docker Image to Registry
   #   image: plugins/docker
