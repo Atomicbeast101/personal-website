@@ -20,6 +20,7 @@ steps:
       CLOUD_PASSWORD:
         from_secret: nextcloud_api_token
     commands:
+      - mkdir -p /config/rclone
       - echo "[PrivateCloud]" >> /config/rclone/rclone.conf
       - echo "type = webdav" >> /config/rclone/rclone.conf
       - echo "url = $CLOUD_URL" >> /config/rclone/rclone.conf
