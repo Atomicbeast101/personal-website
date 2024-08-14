@@ -39,6 +39,15 @@ steps:
       - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /downloads/static/pdf
       - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /downloads/static/images/
 
+  - name: Test
+    image: rclone/rclone
+    volumes:
+      - name: downloads
+        path: /downloads
+    commands:
+      - ls -ls /downloads
+      - ls -ls /downloads/static
+
   - name: Build&Push Docker Image to Registry
     image: plugins/docker
     environment:
