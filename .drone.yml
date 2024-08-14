@@ -10,43 +10,68 @@ trigger:
     - push
 
 steps:
-  - name: Build&Deploy to Test Site
+  - name: Build&Push Docker Image to Registry
+    image: plugins/docker
+    settings:
+      registry: registry-vps.potatolab.dev
+      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
+      username: 
+        from_secret: home_registry_username
+      password: 
+        from_secret: home_registry_password
+      environment:
+        CLOUD_URL:
+          from_secret: nextcloud_webdev_url
+        CLOUD_USERNAME:
+          from_secret: nextcloud_user
+        CLOUD_PASSWORD:
+          from_secret: nextcloud_api_token
+        HUGO_BASEURL: 
+          from_secret: TEST_site_base_url
+        HUGO_TITLE: 
+          from_secret: site_full_name
+        CLOUD_PATH_RESUME_FILENAME:
+          from_secret: nextcloud_path_resume_filename
+        HUGO_PARAMS_AUTHOR: 
+          from_secret: site_full_name
+        HUGO_PARAMS_DESCRIPTION: 
+          from_secret: site_description
+        HUGO_PARAMS_UMAMI_WEBSITEID: 
+          from_secret: TEST_site_umami_websiteid
+        HUGO_PARAMS_UMAMI_JSLOCATION: 
+          from_secret: site_umami_jslocation
+        HUGO_SOCIAL_EMAIL: 
+          from_secret: site_email_address
+        HUGO_SOCIAL_LINKEDIN: 
+          from_secret: site_linkedin_url
+        HUGO_SOCIAL_GITHUB: 
+          from_secret: site_github_url
+      build_args_from_env:
+        - CLOUD_URL
+        - CLOUD_USERNAME
+        - CLOUD_PASSWORD
+        - HUGO_BASEURL
+        - HUGO_TITLE
+        - CLOUD_PATH_RESUME_FILENAME
+        - HUGO_PARAMS_AUTHOR
+        - HUGO_PARAMS_DESCRIPTION
+        - HUGO_PARAMS_UMAMI_WEBSITEID
+        - HUGO_PARAMS_UMAMI_JSLOCATION
+        - HUGO_SOCIAL_EMAIL
+        - HUGO_SOCIAL_LINKEDIN
+        - HUGO_SOCIAL_GITHUB
+      build_args:
+        - HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
+        - HUGO_PARAMS_INFO: Network/DevOps Engineer
+        - HUGO_PARAMS_AVATARURL: images/logo.jpg
+        - HUGO_PARAMS_COLORSCHEME: dark
+        - HUGO_PARAMS_UMAMI_ENABLED: true
+      tags: 
+        - ${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
+
+  - name: Deploy App to k8s
     image: plugins/ansible:3
     environment:
-      NEXTCLOUD_WEBDEV_URL:
-        from_secret: nextcloud_webdev_url
-      NEXTCLOUD_USER:
-        from_secret: nextcloud_user
-      NEXTCLOUD_API_TOKEN:
-        from_secret: nextcloud_api_token
-      HOSTNAME:
-        from_secret: TEST_site_hostname
-      HUGO_BASEURL: 
-        from_secret: TEST_site_base_url
-      HUGO_TITLE: 
-        from_secret: site_full_name
-      NEXTCLOUD_PATH_RESUME_FILENAME:
-        from_secret: nextcloud_path_resume_filename
-      HUGO_PARAMS_AUTHOR: 
-        from_secret: site_full_name
-      HUGO_PARAMS_DESCRIPTION: 
-        from_secret: site_description
-      HUGO_PARAMS_KEYWORDS: 
-        from_secret: blog,personal,devops,systems,administrator,network,networking
-      HUGO_PARAMS_INFO: Network/DevOps Engineer
-      HUGO_PARAMS_AVATARURL: images/logo.jpg
-      HUGO_PARAMS_COLORSCHEME: dark
-      HUGO_PARAMS_UMAMI_ENABLED: true
-      HUGO_PARAMS_UMAMI_WEBSITEID: 
-        from_secret: TEST_site_umami_websiteid
-      HUGO_PARAMS_UMAMI_JSLOCATION: 
-        from_secret: site_umami_jslocation
-      HUGO_SOCIAL_EMAIL: 
-        from_secret: site_email_address
-      HUGO_SOCIAL_LINKEDIN: 
-        from_secret: site_linkedin_url
-      HUGO_SOCIAL_GITHUB: 
-        from_secret: site_github_url
       ANSIBLE_SUDO_PASS:
         from_secret: vps_password
     settings:
@@ -55,6 +80,8 @@ steps:
       private_key:
         from_secret: vps_public_key
       ssh_extra_args: "-o StrictHostKeyChecking=no"
+    depends_on:
+      - Build&Push Docker Image to Registry
 
   - name: Notify Developer of Pipeline Status
     image: plugins/webhook
@@ -77,7 +104,7 @@ steps:
           }
         {{/success}}
     depends_on:
-      - Build&Deploy to Test Site
+      - Deploy App to k8s
     when:
       status:
         - success
@@ -95,43 +122,68 @@ trigger:
     - push
 
 steps:
-  - name: Build&Deploy to Prod Site
+  - name: Build&Push Docker Image to Registry
+    image: plugins/docker
+    settings:
+      registry: registry-vps.potatolab.dev
+      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
+      username: 
+        from_secret: home_registry_username
+      password: 
+        from_secret: home_registry_password
+      environment:
+        CLOUD_URL:
+          from_secret: nextcloud_webdev_url
+        CLOUD_USERNAME:
+          from_secret: nextcloud_user
+        CLOUD_PASSWORD:
+          from_secret: nextcloud_api_token
+        HUGO_BASEURL: 
+          from_secret: PROD_site_base_url
+        HUGO_TITLE: 
+          from_secret: site_full_name
+        CLOUD_PATH_RESUME_FILENAME:
+          from_secret: nextcloud_path_resume_filename
+        HUGO_PARAMS_AUTHOR: 
+          from_secret: site_full_name
+        HUGO_PARAMS_DESCRIPTION: 
+          from_secret: site_description
+        HUGO_PARAMS_UMAMI_WEBSITEID: 
+          from_secret: PROD_site_umami_websiteid
+        HUGO_PARAMS_UMAMI_JSLOCATION: 
+          from_secret: site_umami_jslocation
+        HUGO_SOCIAL_EMAIL: 
+          from_secret: site_email_address
+        HUGO_SOCIAL_LINKEDIN: 
+          from_secret: site_linkedin_url
+        HUGO_SOCIAL_GITHUB: 
+          from_secret: site_github_url
+      build_args_from_env:
+        - CLOUD_URL
+        - CLOUD_USERNAME
+        - CLOUD_PASSWORD
+        - HUGO_BASEURL
+        - HUGO_TITLE
+        - CLOUD_PATH_RESUME_FILENAME
+        - HUGO_PARAMS_AUTHOR
+        - HUGO_PARAMS_DESCRIPTION
+        - HUGO_PARAMS_UMAMI_WEBSITEID
+        - HUGO_PARAMS_UMAMI_JSLOCATION
+        - HUGO_SOCIAL_EMAIL
+        - HUGO_SOCIAL_LINKEDIN
+        - HUGO_SOCIAL_GITHUB
+      build_args:
+        - HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
+        - HUGO_PARAMS_INFO: Network/DevOps Engineer
+        - HUGO_PARAMS_AVATARURL: images/logo.jpg
+        - HUGO_PARAMS_COLORSCHEME: dark
+        - HUGO_PARAMS_UMAMI_ENABLED: true
+      tags: 
+        - ${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
+
+  - name: Deploy App to k8s
     image: plugins/ansible:3
     environment:
-      NEXTCLOUD_WEBDEV_URL:
-        from_secret: nextcloud_webdev_url
-      NEXTCLOUD_USER:
-        from_secret: nextcloud_user
-      NEXTCLOUD_API_TOKEN:
-        from_secret: nextcloud_api_token
-      HOSTNAME:
-        from_secret: PROD_site_hostname
-      HUGO_BASEURL: 
-        from_secret: PROD_site_base_url
-      HUGO_TITLE: 
-        from_secret: site_full_name
-      NEXTCLOUD_PATH_RESUME_FILENAME:
-        from_secret: nextcloud_path_resume_filename
-      HUGO_PARAMS_AUTHOR: 
-        from_secret: site_full_name
-      HUGO_PARAMS_DESCRIPTION: 
-        from_secret: site_description
-      HUGO_PARAMS_KEYWORDS: 
-        from_secret: blog,personal,devops,systems,administrator,network,networking
-      HUGO_PARAMS_INFO: Network/DevOps Engineer
-      HUGO_PARAMS_AVATARURL: images/logo.jpg
-      HUGO_PARAMS_COLORSCHEME: dark
-      HUGO_PARAMS_UMAMI_ENABLED: true
-      HUGO_PARAMS_UMAMI_WEBSITEID: 
-        from_secret: PROD_site_umami_websiteid
-      HUGO_PARAMS_UMAMI_JSLOCATION: 
-        from_secret: site_umami_jslocation
-      HUGO_SOCIAL_EMAIL: 
-        from_secret: site_email_address
-      HUGO_SOCIAL_LINKEDIN: 
-        from_secret: site_linkedin_url
-      HUGO_SOCIAL_GITHUB: 
-        from_secret: site_github_url
       ANSIBLE_SUDO_PASS:
         from_secret: vps_password
     settings:
@@ -140,6 +192,8 @@ steps:
       private_key:
         from_secret: vps_public_key
       ssh_extra_args: "-o StrictHostKeyChecking=no"
+    depends_on:
+      - Build&Push Docker Image to Registry
 
   - name: Notify Developer of Pipeline Status
     image: plugins/webhook
@@ -162,7 +216,7 @@ steps:
           }
         {{/success}}
     depends_on:
-      - Build&Deploy to Prod Site
+      - Deploy App to k8s
     when:
       status:
         - success

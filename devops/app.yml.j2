@@ -1,0 +1,107 @@
+# Secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-key
+  namespace: default
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ global.docker_registry.credentials }}
+
+# Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ app.name }}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ app.name }}
+    spec:
+      containers:
+        - name: site-pd
+          image: {{ app.image }}
+          ports:
+            - name: site-http-tcp
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: TZ
+              value: {{ global.timezone.name }}
+      imagePullSecrets:
+        - name: registry-key
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ app.name }}-svc
+  namespace: default
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: site-http-tcp
+  selector:
+    app: {{ app.name }}
+
+# Certs
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ app.hostname }}-cert
+  namespace: default
+spec:
+  secretName: {{ app.hostname }}-tls
+  dnsNames:
+    - {{ app.hostname }}
+  issuerRef:
+    name: letsencrypt-cissuer
+    kind: ClusterIssuer
+
+# Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ app.name }}-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "goodbye-cookie"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+spec:
+  ingressClassName: public-ingress
+  tls:
+    - hosts:
+      - {{ app.hostname }}
+      secretName: {{ app.hostname }}-tls
+  rules:
+  - host: {{ app.hostname }}
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ app.name }}-svc
+              port:
+                number: 8080
