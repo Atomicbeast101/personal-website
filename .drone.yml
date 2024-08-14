@@ -10,10 +10,13 @@ trigger:
     - push
 
 steps:
-  - name: Build&Push Docker Image to Registry
-    image: plugins/docker
+  - name: Test
+    image: rclone/rclone
     commands:
       - cat /etc/resolv.conf
+
+  - name: Build&Push Docker Image to Registry
+    image: plugins/docker
     environment:
       RCLONE_CONFIG_CLOUD_TYPE: webdav
       RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
