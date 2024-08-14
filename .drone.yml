@@ -9,6 +9,10 @@ trigger:
   event:
     - push
 
+volumes:
+  - name: downloads
+    temp: {}
+
 steps:
   - name: Download Images & Resume PDF from Private Cloud
     image: rclone/rclone
@@ -23,16 +27,22 @@ steps:
         from_secret: nextcloud_api_token
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
+    volumes:
+      - name: downloads
+        path: /downloads
     commands:
-      - mkdir -p ~/static/pdf
-      - mkdir -p ~/static/images
-      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
-      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" ~/static/images/
+      - mkdir -p /downloads/static/pdf
+      - mkdir -p /downloads/static/images
+      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /downloads/static/pdf
+      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /downloads/static/images/
 
   - name: Test
     image: rclone/rclone
+    volumes:
+      - name: downloads
+        path: /downloads
     commands:
-      - ls -ls
+      - ls -ls /downloads
 
   # - name: Build&Push Docker Image to Registry
   #   image: plugins/docker
