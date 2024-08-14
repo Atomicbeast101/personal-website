@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install rclone -y
 RUN mkdir -p /tmp/static
 RUN mkdir -p /tmp/static/pdf
 RUN mkdir -p /tmp/static/images
+RUN mkdir -p /root/.config/rclone/
 
 # Create rclone config
 RUN echo "[PrivateCloud]" >> /root/.config/rclone/rclone.conf
