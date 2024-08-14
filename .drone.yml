@@ -13,33 +13,27 @@ steps:
   - name: Download Images & Resume PDF from Private Cloud
     image: rclone/rclone
     environment:
-      CLOUD_URL:
+      RCLONE_CONFIG_RSHARE_TYPE: webdav
+      RCLONE_CONFIG_RSHARE_VENDOR: nextcloud
+      RCLONE_CONFIG_RSHARE_URL: 
         from_secret: nextcloud_webdev_url
-      CLOUD_USERNAME:
+      RCLONE_CONFIG_RSHARE_USER: 
         from_secret: nextcloud_user
-      CLOUD_PASSWORD:
+      RCLONE_CONFIG_RSHARE_PASS: 
         from_secret: nextcloud_api_token
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
-      - mkdir -p /config/rclone
-      - echo "[PrivateCloud]" >> /config/rclone/rclone.config
-      - echo "type = webdav" >> /config/rclone/rclone.config
-      - echo "url = $CLOUD_URL" >> /config/rclone/rclone.config
-      - echo "vendor = nextcloud" >> /config/rclone/rclone.config
-      - echo "user = $CLOUD_USERNAME" >> /config/rclone/rclone.config
-      - echo "pass = REPLACED_BY_NEXT_CMD" >> /config/rclone/rclone.config
-      - rclone config password PrivateCloud pass $CLOUD_PASSWORD
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
-      - rclone lsf PrivateCloud:/
-      - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
-      - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
+      - rclone lsf rshare:/
+      # - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
+      # - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
-  - name: Test
-    image: rclone/rclone
-    commands:
-      - ls -ls
+  # - name: Test
+  #   image: rclone/rclone
+  #   commands:
+  #     - ls -ls
 
   # - name: Build&Push Docker Image to Registry
   #   image: plugins/docker
