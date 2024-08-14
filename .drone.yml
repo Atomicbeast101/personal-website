@@ -24,6 +24,7 @@ steps:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
+      - rclone listremotes
       - "rclone lsf cloud:"
       # - mkdir -p ~/static/pdf
       # - mkdir -p ~/static/images
