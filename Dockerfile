@@ -21,8 +21,8 @@ ENV CLOUD_PATH_RESUME_FILENAME=${CLOUD_PATH_RESUME_FILENAME}
 RUN mkdir -p /tmp/static
 
 # Download files
-RUN rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /downloads/static/pdf
-RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /downloads/static/images/
+RUN rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /tmp/static/pdf
+RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /tmp/static/images/
 
 # Run image
 FROM hugomods/hugo:base
