@@ -24,16 +24,15 @@ steps:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
-      - rclone lsf cloud:/
-      # - mkdir -p ~/static/pdf
-      # - mkdir -p ~/static/images
-      # - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
-      # - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
+      - mkdir -p ~/static/pdf
+      - mkdir -p ~/static/images
+      - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
+      - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
-  # - name: Test
-  #   image: rclone/rclone
-  #   commands:
-  #     - ls -ls
+  - name: Test
+    image: rclone/rclone
+    commands:
+      - ls -ls
 
   # - name: Build&Push Docker Image to Registry
   #   image: plugins/docker
