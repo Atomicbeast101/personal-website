@@ -1,7 +1,4 @@
 # Arguments
-ARG CLOUD_URL
-ARG CLOUD_USERNAME
-ARG CLOUD_PASSWORD
 ARG HUGO_BASEURL
 ARG HUGO_TITLE
 ARG CLOUD_PATH_RESUME_FILENAME
@@ -18,38 +15,11 @@ ARG HUGO_SOCIAL_EMAIL
 ARG HUGO_SOCIAL_LINKEDIN
 ARG HUGO_SOCIAL_GITHUB
 
-# Build image
-FROM ubuntu
-
-# Install dependencies
-RUN apt-get update && apt-get install rclone -y
-
-# Create required directories
-RUN mkdir -p /tmp/static
-RUN mkdir -p /tmp/static/pdf
-RUN mkdir -p /tmp/static/images
-RUN mkdir -p /root/.config/rclone/
-
-# Create rclone config
-RUN echo "[PrivateCloud]" >> /root/.config/rclone/rclone.conf
-RUN echo "type = webdav" >> /root/.config/rclone/rclone.conf
-RUN echo "url = ${CLOUD_URL}" >> /root/.config/rclone/rclone.conf
-RUN echo "vendor = nextcloud" >> /root/.config/rclone/rclone.conf
-RUN echo "user = ${CLOUD_USERNAME}" >> /root/.config/rclone/rclone.conf
-RUN echo "pass = REPLACED_BY_NEXT_CMD" >> /root/.config/rclone/rclone.conf
-RUN cat /root/.config/rclone/rclone.conf
-RUN echo ${CLOUD_PASSWORD}
-RUN rclone config password PrivateCloud pass ${CLOUD_PASSWORD}
-
-# Download stuff from NextCloud
-RUN rclone copy PrivateCloud:"/Documents/Job Applications/${CLOUD_PATH_RESUME_FILENAME}" "/tmp/static/pdf"
-RUN rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" "/tmp/static/images/"
-
 # Run image
 FROM hugomods/hugo:base
 
 # Copy files over
-COPY --from=0 /tmp/static/ /src/
+COPY /downloads/static/ /src/
 COPY archetypes/ /src
 COPY content/ /src
 COPY layouts/ /src
