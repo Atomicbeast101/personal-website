@@ -13,20 +13,21 @@ steps:
   - name: Download Images & Resume PDF from Private Cloud
     image: rclone/rclone
     environment:
-      RCLONE_CONFIG_RSHARE_TYPE: webdav
-      RCLONE_CONFIG_RSHARE_VENDOR: nextcloud
-      RCLONE_CONFIG_RSHARE_URL: 
+      RCLONE_CONFIG_CLOUD_TYPE: webdav
+      RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
+      RCLONE_CONFIG_CLOUD_URL: 
         from_secret: nextcloud_webdev_url
-      RCLONE_CONFIG_RSHARE_USER: 
+      RCLONE_CONFIG_CLOUD_USER: 
         from_secret: nextcloud_user
-      RCLONE_CONFIG_RSHARE_PASS: 
+      CLOUD_PASSWORD: 
         from_secret: nextcloud_api_token
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
+      - rclone config password cloud pass $CLOUD_PASSWORD
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
-      - rclone lsf rshare:/
+      - rclone lsf cloud:/
       # - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
       # - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
