@@ -23,12 +23,12 @@ steps:
         from_secret: nextcloud_path_resume_filename
     commands:
       - mkdir -p /config/rclone
-      - echo "[PrivateCloud]" >> /config/rclone/rclone.conf
-      - echo "type = webdav" >> /config/rclone/rclone.conf
-      - echo "url = $CLOUD_URL" >> /config/rclone/rclone.conf
-      - echo "vendor = nextcloud" >> /config/rclone/rclone.conf
-      - echo "user = $CLOUD_USERNAME" >> /config/rclone/rclone.conf
-      - echo "pass = REPLACED_BY_NEXT_CMD" >> /config/rclone/rclone.conf
+      - echo "[PrivateCloud]" >> /config/rclone/rclone.config
+      - echo "type = webdav" >> /config/rclone/rclone.config
+      - echo "url = $CLOUD_URL" >> /config/rclone/rclone.config
+      - echo "vendor = nextcloud" >> /config/rclone/rclone.config
+      - echo "user = $CLOUD_USERNAME" >> /config/rclone/rclone.config
+      - echo "pass = REPLACED_BY_NEXT_CMD" >> /config/rclone/rclone.config
       - rclone config password PrivateCloud pass $CLOUD_PASSWORD
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
