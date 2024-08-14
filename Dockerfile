@@ -63,7 +63,6 @@ ENV HUGO_RESUME=${CLOUD_PATH_RESUME_FILENAME}
 
 # Copy files over
 COPY --from=0 /tmp/static/ /src/
-COPY /downloads/static/ /src/
 COPY archetypes/ /src
 COPY content/ /src
 COPY layouts/ /src
