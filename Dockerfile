@@ -7,7 +7,7 @@ ARG CLOUD_PASSWORD
 FROM ubuntu
 
 # Install dependencies
-RUN apt-get install rclone -y
+RUN apt-get update && apt-get install rclone -y
 
 # Create required directories
 RUN mkdir -p /tmp/static
