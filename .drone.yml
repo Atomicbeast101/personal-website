@@ -14,7 +14,7 @@ volumes:
     temp: {}
   - name: docker
     host:
-      path: /var/lib/docker
+      path: /var/run/docker.sock
 
 steps:
   - name: Download Images & Resume PDF from Private Cloud
@@ -71,7 +71,7 @@ steps:
       - name: downloads
         path: /downloads
       - name: docker
-        path: /var/lib/docker
+        path: /var/run/docker.sock
     settings:
       registry: registry-vps.potatolab.dev
       repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
