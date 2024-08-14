@@ -19,6 +19,7 @@ ARG HUGO_SOCIAL_GITHUB
 FROM hugomods/hugo:base
 
 # Copy files over
+RUN ls -ls /downloads/static
 COPY /downloads/static/ /src/
 COPY archetypes/ /src
 COPY content/ /src
