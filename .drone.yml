@@ -19,8 +19,8 @@ steps:
         from_secret: nextcloud_user
       CLOUD_PASSWORD:
         from_secret: nextcloud_api_token
-      CLOUD_PATH_RESUME_FILENAME: BrodackAdam_NetworkDevOpsEngineer_Resume.pdf
-        # from_secret: nextcloud_path_resume_filename
+      CLOUD_PATH_RESUME_FILENAME:
+        from_secret: nextcloud_path_resume_filename
     commands:
       - mkdir -p /config/rclone
       - echo "[PrivateCloud]" >> /config/rclone/rclone.conf
@@ -32,6 +32,7 @@ steps:
       - rclone config password PrivateCloud pass $CLOUD_PASSWORD
       - mkdir -p ~/static/pdf
       - mkdir -p ~/static/images
+      - rclone config show PrivateCloud
       - rclone copy PrivateCloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf
       - rclone sync --create-empty-src-dirs PrivateCloud:"/Photos/Personal Site Images/" ~/static/images/
 
