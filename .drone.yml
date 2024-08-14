@@ -17,8 +17,8 @@ volumes:
       path: /var/run/docker.sock
 
 steps:
-  - name: Download Images & Resume PDF from Private Cloud
-    image: rclone/rclone
+  - name: Build&Push Docker Image to Registry
+    image: plugins/docker
     environment:
       RCLONE_CONFIG_CLOUD_TYPE: webdav
       RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
@@ -30,33 +30,10 @@ steps:
         from_secret: nextcloud_api_token
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
-    volumes:
-      - name: downloads
-        path: /downloads
-    commands:
-      - mkdir -p /downloads/static/pdf
-      - mkdir -p /downloads/static/images
-      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /downloads/static/pdf
-      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /downloads/static/images/
-
-  - name: Test
-    image: rclone/rclone
-    volumes:
-      - name: downloads
-        path: /downloads
-    commands:
-      - ls -ls /downloads
-      - ls -ls /downloads/static
-
-  - name: Build&Push Docker Image to Registry
-    image: plugins/docker
-    environment:
       HUGO_BASEURL: 
         from_secret: TEST_site_base_url
       HUGO_TITLE: 
         from_secret: site_full_name
-      CLOUD_PATH_RESUME_FILENAME:
-        from_secret: nextcloud_path_resume_filename
       HUGO_PARAMS_AUTHOR: 
         from_secret: site_full_name
       HUGO_PARAMS_DESCRIPTION: 
@@ -89,9 +66,14 @@ steps:
       password: 
         from_secret: home_registry_password
       build_args_from_env:
+        - RCLONE_CONFIG_CLOUD_TYPE
+        - RCLONE_CONFIG_CLOUD_VENDOR
+        - RCLONE_CONFIG_CLOUD_URL
+        - RCLONE_CONFIG_CLOUD_USER
+        - RCLONE_CONFIG_CLOUD_PASS
+        - CLOUD_PATH_RESUME_FILENAME
         - HUGO_BASEURL
         - HUGO_TITLE
-        - CLOUD_PATH_RESUME_FILENAME
         - HUGO_PARAMS_AUTHOR
         - HUGO_PARAMS_DESCRIPTION
         - HUGO_PARAMS_INFO
