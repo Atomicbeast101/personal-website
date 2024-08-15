@@ -21,8 +21,6 @@ ENV CLOUD_PATH_RESUME_FILENAME=${CLOUD_PATH_RESUME_FILENAME}
 RUN mkdir -p /tmp/static
 
 # Download files
-RUN echo "nameserver 10.0.2.15" > /etc/resolv.conf
-RUN echo "nameserver 10.0.2.16" >> /etc/resolv.conf
 RUN rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /tmp/static/pdf
 RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /tmp/static/images/
 
