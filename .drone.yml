@@ -18,31 +18,7 @@ volumes:
       medium: memory
 
 steps:
-  # - name: Download Files from Cloud
-  #   image: rclone/rclone
-  #   volumes:
-  #     - name: repo
-  #       path: /data
-  #   environment:
-  #     RCLONE_CONFIG_CLOUD_TYPE: webdav
-  #     RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
-  #     RCLONE_CONFIG_CLOUD_URL: 
-  #       from_secret: nextcloud_webdev_url
-  #     RCLONE_CONFIG_CLOUD_USER: 
-  #       from_secret: nextcloud_user
-  #     RCLONE_CONFIG_CLOUD_PASS: 
-  #       from_secret: nextcloud_api_token
-  #     CLOUD_PATH_RESUME_FILENAME:
-  #       from_secret: nextcloud_path_resume_filename
-  #   commands:
-  #     - cp -a /drone/src/. /data/
-  #     - mkdir -p /data/static
-  #     - mkdir -p /data/static/pdf
-  #     - mkdir -p /data/static/images
-  #     - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
-  #     - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
-
-  - name: Build&Push Docker Image to Registry
+  - name: Build&Push Docker Image
     image: plugins/docker
     environment:
       RCLONE_CONFIG_CLOUD_TYPE: webdav
@@ -115,19 +91,19 @@ steps:
       tags: 
         - ${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
 
-  # - name: Deploy App to k8s
-  #   image: plugins/ansible:3
-  #   environment:
-  #     ANSIBLE_SUDO_PASS:
-  #       from_secret: vps_password
-  #   settings:
-  #     playbook: devops/playbook.yml
-  #     inventory: devops/inventory
-  #     private_key:
-  #       from_secret: vps_public_key
-  #     ssh_extra_args: "-o StrictHostKeyChecking=no"
-  #   depends_on:
-  #     - Build&Push Docker Image to Registry
+  - name: Deploy App to k8s
+    image: plugins/ansible:3
+    environment:
+      ANSIBLE_SUDO_PASS:
+        from_secret: vps_password
+    settings:
+      playbook: devops/playbook.yml
+      inventory: devops/inventory
+      private_key:
+        from_secret: vps_public_key
+      ssh_extra_args: "-o StrictHostKeyChecking=no"
+    depends_on:
+      - Build&Push Docker Image
 
   # - name: Notify Developer of Pipeline Status
   #   image: plugins/webhook
