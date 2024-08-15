@@ -18,11 +18,32 @@ volumes:
       medium: memory
 
 steps:
-  - name: Download Files from Cloud
-    image: rclone/rclone
-    volumes:
-      - name: repo
-        path: /data
+  # - name: Download Files from Cloud
+  #   image: rclone/rclone
+  #   volumes:
+  #     - name: repo
+  #       path: /data
+  #   environment:
+  #     RCLONE_CONFIG_CLOUD_TYPE: webdav
+  #     RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
+  #     RCLONE_CONFIG_CLOUD_URL: 
+  #       from_secret: nextcloud_webdev_url
+  #     RCLONE_CONFIG_CLOUD_USER: 
+  #       from_secret: nextcloud_user
+  #     RCLONE_CONFIG_CLOUD_PASS: 
+  #       from_secret: nextcloud_api_token
+  #     CLOUD_PATH_RESUME_FILENAME:
+  #       from_secret: nextcloud_path_resume_filename
+  #   commands:
+  #     - cp -a /drone/src/. /data/
+  #     - mkdir -p /data/static
+  #     - mkdir -p /data/static/pdf
+  #     - mkdir -p /data/static/images
+  #     - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
+  #     - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
+
+  - name: Build&Push Docker Image to Registry
+    image: plugins/docker
     environment:
       RCLONE_CONFIG_CLOUD_TYPE: webdav
       RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
@@ -32,19 +53,6 @@ steps:
         from_secret: nextcloud_user
       RCLONE_CONFIG_CLOUD_PASS: 
         from_secret: nextcloud_api_token
-      CLOUD_PATH_RESUME_FILENAME:
-        from_secret: nextcloud_path_resume_filename
-    commands:
-      - cp -a /drone/src/. /data/
-      - mkdir -p /data/static
-      - mkdir -p /data/static/pdf
-      - mkdir -p /data/static/images
-      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
-      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
-
-  - name: Build&Push Docker Image to Registry
-    image: plugins/docker
-    environment:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
       HUGO_BASEURL: 
@@ -76,7 +84,7 @@ steps:
       - name: repo
         path: /data
     settings:
-      context: /data
+      custom_dns: 10.0.2.15
       registry: registry-vps.potatolab.dev
       repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
       username: 
@@ -84,6 +92,11 @@ steps:
       password: 
         from_secret: home_registry_password
       build_args_from_env:
+        - RCLONE_CONFIG_CLOUD_TYPE
+        - RCLONE_CONFIG_CLOUD_VENDOR
+        - RCLONE_CONFIG_CLOUD_URL
+        - RCLONE_CONFIG_CLOUD_USER
+        - RCLONE_CONFIG_CLOUD_PASS
         - CLOUD_PATH_RESUME_FILENAME
         - HUGO_BASEURL
         - HUGO_TITLE
