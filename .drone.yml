@@ -36,6 +36,7 @@ steps:
         from_secret: nextcloud_path_resume_filename
     commands:
       - ls -ls
+      - pwd
       - cp -a ~/. /data/
       - mkdir -p /data/static
       - mkdir -p /data/static/pdf
