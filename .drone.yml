@@ -42,8 +42,34 @@ steps:
       - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
       - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
 
-  - name: Test2
+  - name: Build&Push Docker Image to Registry
     image: plugins/docker
+    environment:
+      CLOUD_PATH_RESUME_FILENAME:
+        from_secret: nextcloud_path_resume_filename
+      HUGO_BASEURL: 
+        from_secret: TEST_site_base_url
+      HUGO_TITLE: 
+        from_secret: site_full_name
+      HUGO_PARAMS_AUTHOR: 
+        from_secret: site_full_name
+      HUGO_PARAMS_DESCRIPTION: 
+        from_secret: site_description
+      HUGO_PARAMS_INFO: Network/DevOps Engineer
+      HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
+      HUGO_PARAMS_AVATARURL: images/logo.jpg
+      HUGO_PARAMS_COLORSCHEME: dark
+      HUGO_PARAMS_UMAMI_ENABLED: true
+      HUGO_PARAMS_UMAMI_WEBSITEID: 
+        from_secret: TEST_site_umami_websiteid
+      HUGO_PARAMS_UMAMI_JSLOCATION: 
+        from_secret: site_umami_jslocation
+      HUGO_SOCIAL_EMAIL: 
+        from_secret: site_email_address
+      HUGO_SOCIAL_LINKEDIN: 
+        from_secret: site_linkedin_url
+      HUGO_SOCIAL_GITHUB: 
+        from_secret: site_github_url
     volumes:
       - name: docker
         path: /var/run/docker.sock
@@ -51,75 +77,30 @@ steps:
         path: /data
     settings:
       context: /data
-    commands:
-      - ls -ls
-
-  # - name: Build&Push Docker Image to Registry
-  #   image: plugins/docker
-  #   environment:
-  #     RCLONE_CONFIG_CLOUD_TYPE: webdav
-  #     RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
-  #     RCLONE_CONFIG_CLOUD_URL: 
-  #       from_secret: nextcloud_webdev_url
-  #     RCLONE_CONFIG_CLOUD_USER: 
-  #       from_secret: nextcloud_user
-  #     RCLONE_CONFIG_CLOUD_PASS: 
-  #       from_secret: nextcloud_api_token
-  #     CLOUD_PATH_RESUME_FILENAME:
-  #       from_secret: nextcloud_path_resume_filename
-  #     HUGO_BASEURL: 
-  #       from_secret: TEST_site_base_url
-  #     HUGO_TITLE: 
-  #       from_secret: site_full_name
-  #     HUGO_PARAMS_AUTHOR: 
-  #       from_secret: site_full_name
-  #     HUGO_PARAMS_DESCRIPTION: 
-  #       from_secret: site_description
-  #     HUGO_PARAMS_INFO: Network/DevOps Engineer
-  #     HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
-  #     HUGO_PARAMS_AVATARURL: images/logo.jpg
-  #     HUGO_PARAMS_COLORSCHEME: dark
-  #     HUGO_PARAMS_UMAMI_ENABLED: true
-  #     HUGO_PARAMS_UMAMI_WEBSITEID: 
-  #       from_secret: TEST_site_umami_websiteid
-  #     HUGO_PARAMS_UMAMI_JSLOCATION: 
-  #       from_secret: site_umami_jslocation
-  #     HUGO_SOCIAL_EMAIL: 
-  #       from_secret: site_email_address
-  #     HUGO_SOCIAL_LINKEDIN: 
-  #       from_secret: site_linkedin_url
-  #     HUGO_SOCIAL_GITHUB: 
-  #       from_secret: site_github_url
-  #   settings:
-  #     registry: registry-vps.potatolab.dev
-  #     repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
-  #     username: 
-  #       from_secret: home_registry_username
-  #     password: 
-  #       from_secret: home_registry_password
-  #     build_args_from_env:
-  #       - RCLONE_CONFIG_CLOUD_TYPE
-  #       - RCLONE_CONFIG_CLOUD_VENDOR
-  #       - RCLONE_CONFIG_CLOUD_URL
-  #       - RCLONE_CONFIG_CLOUD_USER
-  #       - RCLONE_CONFIG_CLOUD_PASS
-  #       - CLOUD_PATH_RESUME_FILENAME
-  #       - HUGO_BASEURL
-  #       - HUGO_TITLE
-  #       - HUGO_PARAMS_AUTHOR
-  #       - HUGO_PARAMS_DESCRIPTION
-  #       - HUGO_PARAMS_INFO
-  #       - HUGO_PARAMS_KEYWORDS
-  #       - HUGO_PARAMS_AVATARURL
-  #       - HUGO_PARAMS_COLORSCHEME
-  #       - HUGO_PARAMS_UMAMI_ENABLED
-  #       - HUGO_PARAMS_UMAMI_WEBSITEID
-  #       - HUGO_PARAMS_UMAMI_JSLOCATION
-  #       - HUGO_SOCIAL_EMAIL
-  #       - HUGO_SOCIAL_LINKEDIN
-  #       - HUGO_SOCIAL_GITHUB
-  #     tags: 
-  #       - ${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
+      registry: registry-vps.potatolab.dev
+      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
+      username: 
+        from_secret: home_registry_username
+      password: 
+        from_secret: home_registry_password
+      build_args_from_env:
+        - CLOUD_PATH_RESUME_FILENAME
+        - HUGO_BASEURL
+        - HUGO_TITLE
+        - HUGO_PARAMS_AUTHOR
+        - HUGO_PARAMS_DESCRIPTION
+        - HUGO_PARAMS_INFO
+        - HUGO_PARAMS_KEYWORDS
+        - HUGO_PARAMS_AVATARURL
+        - HUGO_PARAMS_COLORSCHEME
+        - HUGO_PARAMS_UMAMI_ENABLED
+        - HUGO_PARAMS_UMAMI_WEBSITEID
+        - HUGO_PARAMS_UMAMI_JSLOCATION
+        - HUGO_SOCIAL_EMAIL
+        - HUGO_SOCIAL_LINKEDIN
+        - HUGO_SOCIAL_GITHUB
+      tags: 
+        - ${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
 
   # - name: Deploy App to k8s
   #   image: plugins/ansible:3
