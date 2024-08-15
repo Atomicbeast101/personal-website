@@ -41,7 +41,7 @@ steps:
       - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf/
       - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" ~/static/images/
 
-  - name: Test
+  - name: Test2
     image: plugins/docker
     volumes:
       - name: docker
