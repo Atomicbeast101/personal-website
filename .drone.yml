@@ -9,12 +9,47 @@ trigger:
   event:
     - push
 
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+  - name: repo
+    temp:
+      medium: memory
+
 steps:
   - name: Test
     image: rclone/rclone
+    volumes:
+      - name: repo
+        path: /drone/src
+    environment:
+      RCLONE_CONFIG_CLOUD_TYPE: webdav
+      RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
+      RCLONE_CONFIG_CLOUD_URL: 
+        from_secret: nextcloud_webdev_url
+      RCLONE_CONFIG_CLOUD_USER: 
+        from_secret: nextcloud_user
+      RCLONE_CONFIG_CLOUD_PASS: 
+        from_secret: nextcloud_api_token
+      CLOUD_PATH_RESUME_FILENAME:
+        from_secret: nextcloud_path_resume_filename
+    commands:
+      - mkdir -p ~/static
+      - mkdir -p ~/static/pdf
+      - mkdir -p ~/static/images
+      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf/
+      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" ~/static/images/
+
+  - name: Test
+    image: plugins/docker
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+      - name: repo
+        path: /drone/src
     commands:
       - ls -ls
-      - pwd
 
   # - name: Build&Push Docker Image to Registry
   #   image: plugins/docker
