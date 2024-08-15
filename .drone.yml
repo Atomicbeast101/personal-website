@@ -18,7 +18,7 @@ volumes:
       medium: memory
 
 steps:
-  - name: Test
+  - name: Download Files from Cloud
     image: rclone/rclone
     volumes:
       - name: repo
@@ -41,6 +41,7 @@ steps:
       - mkdir -p /data/static/images
       - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
       - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
+      - ls -ls /data
 
   - name: Build&Push Docker Image to Registry
     image: plugins/docker
