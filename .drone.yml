@@ -22,7 +22,7 @@ steps:
     image: rclone/rclone
     volumes:
       - name: repo
-        path: /drone/src
+        path: /data
     environment:
       RCLONE_CONFIG_CLOUD_TYPE: webdav
       RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
@@ -35,11 +35,12 @@ steps:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
-      - mkdir -p ~/static
-      - mkdir -p ~/static/pdf
-      - mkdir -p ~/static/images
-      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" ~/static/pdf/
-      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" ~/static/images/
+      - copy -a ~/. /data/
+      - mkdir -p /data/static
+      - mkdir -p /data/static/pdf
+      - mkdir -p /data/static/images
+      - rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /data/static/pdf/
+      - rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /data/static/images/
 
   - name: Test2
     image: plugins/docker
@@ -47,7 +48,9 @@ steps:
       - name: docker
         path: /var/run/docker.sock
       - name: repo
-        path: /drone/src
+        path: /data
+    settings:
+      context: /data
     commands:
       - ls -ls
 
