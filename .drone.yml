@@ -35,7 +35,7 @@ steps:
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
     commands:
-      - copy -a ~/. /data/
+      - cp -a ~/. /data/
       - mkdir -p /data/static
       - mkdir -p /data/static/pdf
       - mkdir -p /data/static/images
