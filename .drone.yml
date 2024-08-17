@@ -43,7 +43,7 @@ steps:
         - ${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}
 
   - name: Deploy App to k8s
-    image: plugins/ansible
+    image: plugins/ansible:3
     environment:
       ANSIBLE_SUDO_PASS:
         from_secret: vps_password
