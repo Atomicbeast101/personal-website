@@ -6,7 +6,6 @@
     timezone: America/Chicago
     k8s_config: /etc/rancher/k3s/k3s.yaml
     k8s_namespace: "{{ lookup('env', 'K8S_NAMESPACE') }}"
-    app_name: "{{ lookup('env', 'APP_NAME') }}"
     app_image: "{{ lookup('env', 'APP_IMAGE') }}"
     app_hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
     # Used to run the image
@@ -28,10 +27,9 @@
   tasks:
     - name: Install pip packages
       pip:
-        name: "{{ item }}"
-      with_items:
-        - kubernetes
-        - openshift
+        name:
+          - kubernetes
+          - openshift
 
     - name: Create directory to upload k8s config to
       file:

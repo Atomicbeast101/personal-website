@@ -3,17 +3,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ app_name }}
+  name: personal-site
   namespace: {{ k8s_namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ app_name }}
+      app: personal-site
   template:
     metadata:
       labels:
-        app: {{ app_name }}
+        app: personal-site
     spec:
       containers:
         - name: web-pd
@@ -67,7 +67,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ app_name }}-svc
+  name: personal-site-svc
   namespace: {{ k8s_namespace }}
 spec:
   ports:
@@ -75,7 +75,7 @@ spec:
       port: 8080
       targetPort: web-http-tcp
   selector:
-    app: {{ app_name }}
+    app: personal-site
 
 # Certs
 ---
@@ -97,7 +97,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ app_name }}-ingress
+  name: personal-site-ingress
   namespace: {{ k8s_namespace }}
   annotations:
     nginx.ingress.kubernetes.io/affinity: "cookie"
@@ -121,6 +121,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ app_name }}-svc
+              name: personal-site-svc
               port:
                 number: 8080
