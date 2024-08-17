@@ -3,28 +3,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ app.name }}
-  namespace: {{ app.namespace }}
+  name: {{ app_name }}
+  namespace: {{ k8s_namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ app.name }}
+      app: {{ app_name }}
   template:
     metadata:
       labels:
-        app: {{ app.name }}
+        app: {{ app_name }}
     spec:
       containers:
-        - name: site-pd
-          image: {{ app.image }}
+        - name: web-pd
+          image: {{ app_image }}
           ports:
-            - name: site-http-tcp
+            - name: web-http-tcp
               containerPort: 8080
               protocol: TCP
           env:
             - name: TZ
-              value: {{ global.timezone.name }}
+              value: {{ timezone }}
       imagePullSecrets:
         - name: registry-key
       dnsConfig:
@@ -37,27 +37,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ app.name }}-svc
-  namespace: {{ app.namespace }}
+  name: {{ app_name }}-svc
+  namespace: {{ k8s_namespace }}
 spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: site-http-tcp
+      targetPort: web-http-tcp
   selector:
-    app: {{ app.name }}
+    app: {{ app_name }}
 
 # Certs
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ app.hostname }}-cert
-  namespace: {{ app.namespace }}
+  name: {{ app_hostname | replace(".", "-") }}-cert
+  namespace: {{ k8s_namespace }}
 spec:
-  secretName: {{ app.hostname }}-tls
+  secretName: {{ app_hostname | replace(".", "-") }}-tls
   dnsNames:
-    - {{ app.hostname }}
+    - {{ app_hostname }}
   issuerRef:
     name: letsencrypt-cissuer
     kind: ClusterIssuer
@@ -67,8 +67,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ app.name }}-ingress
-  namespace: {{ app.namespace }}
+  name: {{ app_name }}-ingress
+  namespace: {{ k8s_namespace }}
   annotations:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "goodbye-cookie"
@@ -81,16 +81,16 @@ spec:
   ingressClassName: public-ingress
   tls:
     - hosts:
-      - {{ app.hostname }}
-      secretName: {{ app.hostname }}-tls
+      - {{ app_hostname }}
+      secretName: {{ app_hostname | replace(".", "-") }}-tls
   rules:
-  - host: {{ app.hostname }}
+  - host: {{ app_hostname }}
     http:
       paths:
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: {{ app.name }}-svc
+              name: {{ app_name }}-svc
               port:
                 number: 8080
