@@ -25,11 +25,9 @@ spec:
       containers:
         - name: web-pd
           image: {{ app_image }}
-          command: [ 'hugo' ]
-          args: [ 'server', '--bind 0.0.0.0' ]
           ports:
             - name: web-http-tcp
-              containerPort: 1313
+              containerPort: 80
               protocol: TCP
           env:
             - name: TZ
@@ -81,7 +79,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 1313
+      port: 80
       targetPort: web-http-tcp
   selector:
     app: {{ app_name }}
@@ -132,4 +130,4 @@ spec:
             service:
               name: {{ app_name }}-svc
               port:
-                number: 1313
+                number: 80
