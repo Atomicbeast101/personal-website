@@ -28,7 +28,10 @@
   tasks:
     - name: Install pip packages
       pip:
-        name: kubernetes
+        name: "{{ item }}"
+      with_items:
+        - kubernetes
+        - openshift
 
     - name: Create directory to upload k8s config to
       file:
