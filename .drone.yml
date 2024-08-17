@@ -78,6 +78,7 @@ steps:
       HUGO_RESUME:
         from_secret: nextcloud_path_resume_filename
     settings:
+      galaxy: devops/requirements.yml
       playbook: devops/playbook.yml
       inventory: devops/inventory
       private_key:
