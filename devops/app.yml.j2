@@ -1,21 +1,10 @@
-# Secret
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: registry-key
-  namespace: default
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ global.docker_registry.credentials }}
-
 # Deployment
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ app.name }}
-  namespace: default
+  namespace: {{ app.namespace }}
 spec:
   replicas: 1
   selector:
@@ -49,7 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ app.name }}-svc
-  namespace: default
+  namespace: {{ app.namespace }}
 spec:
   ports:
     - protocol: TCP
@@ -64,7 +53,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ app.hostname }}-cert
-  namespace: default
+  namespace: {{ app.namespace }}
 spec:
   secretName: {{ app.hostname }}-tls
   dnsNames:
@@ -79,7 +68,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ app.name }}-ingress
-  namespace: default
+  namespace: {{ app.namespace }}
   annotations:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "goodbye-cookie"

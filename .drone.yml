@@ -9,14 +9,6 @@ trigger:
   event:
     - push
 
-volumes:
-  - name: docker
-    host:
-      path: /var/run/docker.sock
-  - name: repo
-    temp:
-      medium: memory
-
 steps:
   - name: Build&Push Docker Image
     image: plugins/docker
@@ -54,11 +46,6 @@ steps:
         from_secret: site_linkedin_url
       HUGO_SOCIAL_GITHUB: 
         from_secret: site_github_url
-    volumes:
-      - name: docker
-        path: /var/run/docker.sock
-      - name: repo
-        path: /data
     settings:
       custom_dns: 10.0.2.15
       registry: registry-vps.potatolab.dev
@@ -96,6 +83,11 @@ steps:
     environment:
       ANSIBLE_SUDO_PASS:
         from_secret: vps_password
+      K8S_NAMESPACE: test
+      APP_NAME: personal-site
+      APP_IMAGE: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}:${DRONE_COMMIT_BRANCH}-dev-${DRONE_BUILD_NUMBER}
+      APP_HOSTNAME:
+        from_secret: TEST_site_hostname
     settings:
       playbook: devops/playbook.yml
       inventory: devops/inventory

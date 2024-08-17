@@ -2,6 +2,19 @@
 - name: Deploy Personal Site
   hosts: all
   any_errors_fatal: true
+  vars:
+    global:
+      timezone:
+        name: America/Chicago
+      docker_registry:
+        credentials: "{{ lookup('env', 'DOCKER_REGISTRY_CREDENTIALS') }}"
+      kubernetes:
+        config: /etc/rancher/k3s/k3s.yaml
+    app:
+      namespace: "{{ lookup('env', 'K8S_NAMESPACE') }}"
+      name: "{{ lookup('env', 'APP_NAME') }}"
+      image: "{{ lookup('env', 'APP_IMAGE') }}"
+      hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
   tasks:
     - name: Install pip packages
       pip:
