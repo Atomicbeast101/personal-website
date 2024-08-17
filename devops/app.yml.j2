@@ -25,6 +25,36 @@ spec:
           env:
             - name: TZ
               value: {{ timezone }}
+            - name: HUGO_BASEURL
+              value: {{ hugo_baseurl }}
+            - name: HUGO_TITLE
+              value: {{ hugo_title }}
+            - name: HUGO_PARAMS_AUTHOR
+              value: {{ hugo_params_author }}
+            - name: HUGO_PARAMS_DESCRIPTION
+              value: {{ hugo_params_description }}
+            - name: HUGO_PARAMS_KEYWORDS
+              value: {{ hugo_params_keywords }}
+            - name: HUGO_PARAMS_INFO
+              value: {{ hugo_params_info }}
+            - name: HUGO_PARAMS_AVATARURL
+              value: {{ hugo_params_avatarurl }}
+            - name: HUGO_PARAMS_COLORSCHEME
+              value: {{ hugo_params_colorscheme }}
+            - name: HUGO_PARAMS_UMAMI_ENABLED
+              value: {{ hugo_params_umami_enabled }}
+            - name: HUGO_PARAMS_UMAMI_WEBSITEID
+              value: {{ hugo_params_umami_websiteid }}
+            - name: HUGO_PARAMS_UMAMI_JSLOCATION
+              value: {{ hugo_params_umami_jslocation }}
+            - name: HUGO_SOCIAL_EMAIL
+              value: {{ hugo_social_email }}
+            - name: HUGO_SOCIAL_LINKEDIN
+              value: {{ hugo_social_linkedin }}
+            - name: HUGO_SOCIAL_GITHUB
+              value: {{ hugo_social_github }}
+            - name: HUGO_RESUME
+              value: {{ hugo_resume }}
       imagePullSecrets:
         - name: registry-key
       dnsConfig:

@@ -9,6 +9,22 @@
     app_name: "{{ lookup('env', 'APP_NAME') }}"
     app_image: "{{ lookup('env', 'APP_IMAGE') }}"
     app_hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
+    # Used to run the image
+    hugo_baseurl: "{{ lookup('env', 'HUGO_BASEURL') }}"
+    hugo_title: "{{ lookup('env', 'HUGO_TITLE') }}"
+    hugo_params_author: "{{ lookup('env', 'HUGO_PARAMS_AUTHOR') }}"
+    hugo_params_description: "{{ lookup('env', 'HUGO_PARAMS_DESCRIPTION') }}"
+    hugo_params_keywords: "{{ lookup('env', 'HUGO_PARAMS_KEYWORDS') }}"
+    hugo_params_info: "{{ lookup('env', 'HUGO_PARAMS_INFO') }}"
+    hugo_params_avatarurl: "{{ lookup('env', 'HUGO_PARAMS_AVATARURL') }}"
+    hugo_params_colorscheme: "{{ lookup('env', 'HUGO_PARAMS_COLORSCHEME') }}"
+    hugo_params_umami_enabled: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_ENABLED') }}"
+    hugo_params_umami_websiteid: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_WEBSITEID') }}"
+    hugo_params_umami_jslocation: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_JSLOCATION') }}"
+    hugo_social_email: "{{ lookup('env', 'HUGO_SOCIAL_EMAIL') }}"
+    hugo_social_linkedin: "{{ lookup('env', 'HUGO_SOCIAL_LINKEDIN') }}"
+    hugo_social_github: "{{ lookup('env', 'HUGO_SOCIAL_GITHUB') }}"
+    hugo_resume: "{{ lookup('env', 'HUGO_RESUME') }}"
   tasks:
     - name: Install pip packages
       pip:

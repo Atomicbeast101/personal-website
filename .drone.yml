@@ -23,6 +23,36 @@ steps:
         from_secret: nextcloud_api_token
       CLOUD_PATH_RESUME_FILENAME:
         from_secret: nextcloud_path_resume_filename
+    settings:
+      custom_dns: 10.0.2.15
+      registry: registry-vps.potatolab.dev
+      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
+      username: 
+        from_secret: home_registry_username
+      password: 
+        from_secret: home_registry_password
+      build_args_from_env:
+        - RCLONE_CONFIG_CLOUD_TYPE
+        - RCLONE_CONFIG_CLOUD_VENDOR
+        - RCLONE_CONFIG_CLOUD_URL
+        - RCLONE_CONFIG_CLOUD_USER
+        - RCLONE_CONFIG_CLOUD_PASS
+        - CLOUD_PATH_RESUME_FILENAME
+      tags: 
+        - ${DRONE_COMMIT_BRANCH}-latest
+        - ${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}
+
+  - name: Deploy App to k8s
+    image: plugins/ansible:3
+    environment:
+      ANSIBLE_SUDO_PASS:
+        from_secret: vps_password
+      K8S_NAMESPACE: test
+      APP_NAME: personal-site
+      APP_IMAGE: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}:${DRONE_COMMIT_BRANCH}-latest
+      APP_HOSTNAME:
+        from_secret: TEST_site_hostname
+      # Used to run the image
       HUGO_BASEURL: 
         from_secret: TEST_site_base_url
       HUGO_TITLE: 
@@ -46,49 +76,8 @@ steps:
         from_secret: site_linkedin_url
       HUGO_SOCIAL_GITHUB: 
         from_secret: site_github_url
-    settings:
-      custom_dns: 10.0.2.15
-      registry: registry-vps.potatolab.dev
-      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
-      username: 
-        from_secret: home_registry_username
-      password: 
-        from_secret: home_registry_password
-      build_args_from_env:
-        - RCLONE_CONFIG_CLOUD_TYPE
-        - RCLONE_CONFIG_CLOUD_VENDOR
-        - RCLONE_CONFIG_CLOUD_URL
-        - RCLONE_CONFIG_CLOUD_USER
-        - RCLONE_CONFIG_CLOUD_PASS
-        - CLOUD_PATH_RESUME_FILENAME
-        - HUGO_BASEURL
-        - HUGO_TITLE
-        - HUGO_PARAMS_AUTHOR
-        - HUGO_PARAMS_DESCRIPTION
-        - HUGO_PARAMS_INFO
-        - HUGO_PARAMS_KEYWORDS
-        - HUGO_PARAMS_AVATARURL
-        - HUGO_PARAMS_COLORSCHEME
-        - HUGO_PARAMS_UMAMI_ENABLED
-        - HUGO_PARAMS_UMAMI_WEBSITEID
-        - HUGO_PARAMS_UMAMI_JSLOCATION
-        - HUGO_SOCIAL_EMAIL
-        - HUGO_SOCIAL_LINKEDIN
-        - HUGO_SOCIAL_GITHUB
-      tags: 
-        - ${DRONE_COMMIT_BRANCH}-latest
-        - ${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}
-
-  - name: Deploy App to k8s
-    image: plugins/ansible:3
-    environment:
-      ANSIBLE_SUDO_PASS:
-        from_secret: vps_password
-      K8S_NAMESPACE: test
-      APP_NAME: personal-site
-      APP_IMAGE: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}:${DRONE_COMMIT_BRANCH}-latest
-      APP_HOSTNAME:
-        from_secret: TEST_site_hostname
+      HUGO_RESUME:
+        from_secret: nextcloud_path_resume_filename
     settings:
       playbook: devops/playbook.yml
       inventory: devops/inventory
