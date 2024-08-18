@@ -8,6 +8,7 @@
     app_name: "{{ lookup('env', 'APP_NAME') }}"
     app_image: "{{ lookup('env', 'APP_IMAGE') }}"
     app_hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
+    app_ingress: "{{ lookup('env', 'APP_INGRESS') }}"
   tasks:
     - name: Install pip packages
       pip:
