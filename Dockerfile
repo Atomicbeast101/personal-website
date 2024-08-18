@@ -26,7 +26,7 @@ RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /t
 
 
 #### Build Static Files ####
-FROM hugomods/hugo:base AS hugo
+FROM hugomods/hugo:latest AS hugo
 
 # Copy files over
 COPY --from=cloud /tmp/static/ /src/
