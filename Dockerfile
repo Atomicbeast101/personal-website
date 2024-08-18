@@ -29,12 +29,12 @@ RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /t
 FROM hugomods/hugo:git AS hugo
 
 # Copy files over
-COPY --from=cloud /tmp/static/ /src/
-COPY archetypes/ /src
-COPY content/ /src
-COPY layouts/ /src
-COPY resources/ /src
-COPY themes/ /src
+COPY --from=cloud /tmp/static /src/static
+COPY archetypes /src/archetypes
+COPY content /src/content
+COPY layouts /src/layouts
+COPY resources /src/resources
+COPY themes /src/themes
 COPY config.toml /src
 RUN ls -ls
 
