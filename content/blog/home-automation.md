@@ -1,7 +1,7 @@
 ---
 title: "Home Automation"
 date: 2023-11-16T15:48:33-06:00
-draft: false
+draft: true
 ---
 
 [![HomeAssistant](/images/home-automation/banner.webp)](/images/home-automation/banner.webp)
