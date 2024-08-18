@@ -42,4 +42,4 @@ RUN hugo
 
 #### Host Static Files via Nginx ####
 FROM nginx
-COPY --from=hugo /src/public/. /usr/share/nginx/html
+COPY --from=hugo /src/public /usr/share/nginx/html
