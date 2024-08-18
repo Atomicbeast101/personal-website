@@ -26,7 +26,7 @@ RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /t
 
 
 #### Build Static Files ####
-FROM hugomods/hugo:latest AS hugo
+FROM hugomods/hugo:git AS hugo
 
 # Copy files over
 COPY --from=cloud /tmp/static/ /src/
@@ -38,7 +38,7 @@ COPY themes/ /src
 COPY config.toml /src
 
 # Generate static files
-RUN hugo mod init github.com/luizdepra/hugo-coder.git
+RUN git submodule add https://github.com/luizdepra/hugo-coder.git /src/themes/hugo-coder
 RUN hugo
 
 #### Host Static Files via Nginx ####
