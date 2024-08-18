@@ -3,121 +3,42 @@
   hosts: all
   any_errors_fatal: true
   vars:
-    apt_packages:
-      - rclone
-      - hugo
-    hugo_contents:
-      - { src: ../archetypes/, dest: /tmp/site/archetypes/ }
-      - { src: ../content/, dest: /tmp/site/content/ }
-      - { src: ../layouts/, dest: /tmp/site/layouts/ }
-      - { src: ../resources/, dest: /tmp/site/resources/ }
-      - { src: ../themes/, dest: /tmp/site/themes/ }
-      - { src: ../config.toml, dest: /tmp/site/config.toml }
+    timezone: America/Chicago
+    k8s_config: /etc/rancher/k3s/k3s.yaml
+    app_name: "{{ lookup('env', 'APP_NAME') }}"
+    app_image: "{{ lookup('env', 'APP_IMAGE') }}"
+    app_hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
+    app_ingress: "{{ lookup('env', 'APP_INGRESS') }}"
   tasks:
-    - name: Install required packages
-      apt:
+    - name: Install pip packages
+      pip:
         name:
-          - rclone
-          - hugo
+          - kubernetes
+          - openshift
 
-    - name: Create /root/.config/rclone/
+    - name: Create directory to upload k8s config to
       file:
-        path: /root/.config/rclone/
-        mode: '0755'
+        path: /root/deployments
         state: directory
-    
-    - name: Copy rclone config 
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Upload k8s config
       template:
-        src: rclone.conf.j2
-        dest: /root/.config/rclone/rclone.conf
+        src: app.yml.j2
+        dest: /root/deployments/app.yml
         owner: root
         group: root
         mode: 0644
-      register: rclone_config
-    
-    - name: Set encrypted password in rclone.conf
-      command: rclone config password PotatoCloud pass {{ lookup('env', 'NEXTCLOUD_API_TOKEN') }}
 
-    - name: Create /tmp/site
-      file:
-        path: /tmp/site
-        mode: '0755'
-        state: directory
+    - name: Load app to k8s
+      k8s:
+        kubeconfig: "{{ k8s_config }}"
+        src: /root/deployments/app.yml
+        state: present
 
-    # - name: Copy following directories to /tmp/site
-    #   copy:
-    #     src: "{{ item.src }}"
-    #     dest: "{{ item.dest }}"
-    #   with_items: "{{ hugo_contents }}"
-
-    - name: Clone git repository
-      git:
-        repo: https://github.com/Atomicbeast101/personal-website.git
-        dest: /tmp/site
-        version: "{{ lookup('env', 'DRONE_BRANCH') }}"
-
-    - name: Create necessary folders
-      file:
-        path: "{{ item }}"
-        mode: '0755'
-        state: directory
-      with_items:
-        - /tmp/site/static
-        - /tmp/site/static/pdf
-        - /tmp/site/static/images
-        - "/var/www/{{ lookup('env', 'HOSTNAME') }}"
-
-    - name: Pull resume from NextCloud
-      shell: 
-        cmd: rclone copy PotatoCloud:"/Documents/Job Applications/{{ lookup('env', 'NEXTCLOUD_PATH_RESUME_FILENAME') }}" "/tmp/site/static/pdf"
-
-    - name: Pull images from NextCloud
-      shell: 
-        cmd: rclone sync --create-empty-src-dirs PotatoCloud:"/Photos/Personal Site Images/" "/tmp/site/static/images/"
-
-    - name: Build static pages using hugo
-      shell: 
-        cmd: hugo
-        chdir: /tmp/site
-      environment:
-        HUGO_BASEURL: "{{ lookup('env', 'HUGO_BASEURL') }}"
-        HUGO_TITLE: "{{ lookup('env', 'HUGO_TITLE') }}"
-        HUGO_PARAMS_AUTHOR: "{{ lookup('env', 'HUGO_PARAMS_AUTHOR') }}"
-        HUGO_PARAMS_DESCRIPTION: "{{ lookup('env', 'HUGO_PARAMS_DESCRIPTION') }}"
-        HUGO_PARAMS_KEYWORDS: "{{ lookup('env', 'HUGO_PARAMS_KEYWORDS') }}"
-        HUGO_PARAMS_INFO: "{{ lookup('env', 'HUGO_PARAMS_INFO') }}"
-        HUGO_PARAMS_AVATARURL: "{{ lookup('env', 'HUGO_PARAMS_AVATARURL') }}"
-        HUGO_PARAMS_COLORSCHEME: "{{ lookup('env', 'HUGO_PARAMS_COLORSCHEME') }}"
-        HUGO_PARAMS_UMAMI_ENABLED: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_ENABLED') }}"
-        HUGO_PARAMS_UMAMI_WEBSITEID: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_WEBSITEID') }}"
-        HUGO_PARAMS_UMAMI_JSLOCATION: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_JSLOCATION') }}"
-        HUGO_SOCIAL_EMAIL: "{{ lookup('env', 'HUGO_SOCIAL_EMAIL') }}"
-        HUGO_SOCIAL_LINKEDIN: "{{ lookup('env', 'HUGO_SOCIAL_LINKEDIN') }}"
-        HUGO_SOCIAL_GITHUB: "{{ lookup('env', 'HUGO_SOCIAL_GITHUB') }}"
-        HUGO_RESUME: "{{ lookup('env', 'NEXTCLOUD_PATH_RESUME_FILENAME') }}"
-
-    - name: "Copy website contents over to /var/www/{{ lookup('env', 'HOSTNAME') }}"
-      copy:
-        src: /tmp/site/public/
-        dest: "/var/www/{{ lookup('env', 'HOSTNAME') }}"
-        remote_src: yes
-    
-    - name: "Set permissions for /var/www/{{ lookup('env', 'HOSTNAME') }}"
-      file:
-        path: "/var/www/{{ lookup('env', 'HOSTNAME') }}"
-        state: directory
-        owner: www-data
-        group: www-data
-        recurse: yes
-
-    # validate its working
-
-    - name: Remove rclone config
-      file:
-        path: /root/.config/rclone/rclone.conf
-        state: absent
-
-    - name: Remove /tmp/site
-      file:
-        path: /tmp/site
+    - name: Remove k8s config
+      ansible.builtin.file:
+        path: /root/deployments/app.yml
         state: absent

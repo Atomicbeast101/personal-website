@@ -1,0 +1,103 @@
+# Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default
+
+# Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ app_name }}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ app_name }}
+  template:
+    metadata:
+      labels:
+        app: {{ app_name }}
+    spec:
+      containers:
+        - name: web-pd
+          image: {{ app_image }}
+          ports:
+            - name: web-http-tcp
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: TZ
+              value: {{ timezone }}
+      imagePullSecrets:
+        - name: registry-client-sc
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ app_name }}-svc
+  namespace: default
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: web-http-tcp
+  selector:
+    app: {{ app_name }}
+
+# Certs
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ app_hostname | replace(".", "-") }}-cert
+  namespace: default
+spec:
+  secretName: {{ app_hostname | replace(".", "-") }}-tls
+  dnsNames:
+    - {{ app_hostname }}
+  issuerRef:
+    name: letsencrypt-cissuer
+    kind: ClusterIssuer
+
+# Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ app_name }}-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "goodbye-cookie"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+spec:
+  ingressClassName: {{ app_ingress }}
+  tls:
+    - hosts:
+      - {{ app_hostname }}
+      secretName: {{ app_hostname | replace(".", "-") }}-tls
+  rules:
+  - host: {{ app_hostname }}
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ app_name }}-svc
+              port:
+                number: 80

@@ -2,3 +2,4 @@ hugo.sh
 static/
 public/
 .hugo_build.lock
+old/

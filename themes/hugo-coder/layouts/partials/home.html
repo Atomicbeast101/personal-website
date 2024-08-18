@@ -30,19 +30,19 @@
     <ul>
       <!-- Email -->
       <li>
-        <a href="mailto:{{ .Site.Social.email | safeURL }}" aria-label="Email">
+        <a href="mailto:{{ .Site.Params.email | safeURL }}" aria-label="Email">
           <i class="fa fa-envelope" aria-hidden="true"></i>
         </a>
       </li>
       <!-- LinkedIn -->
       <li>
-        <a href="{{ .Site.Social.linkedin | safeURL }}" aria-label="LinkedIn">
+        <a href="{{ .Site.Params.linkedin | safeURL }}" aria-label="LinkedIn">
           <i class="fa fa-linkedin" aria-hidden="true"></i>
         </a>
       </li>
       <!-- GitHub -->
       <li>
-        <a href="{{ .Site.Social.github | safeURL }}" aria-label="Github">
+        <a href="{{ .Site.Params.github | safeURL }}" aria-label="Github">
           <i class="fa fa-github" aria-hidden="true"></i>
         </a>
       </li>

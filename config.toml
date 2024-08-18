@@ -1,6 +1,6 @@
 baseURL = ""
 title = ""
-theme = ["hugo-coder", "matomo"]
+theme = ["hugo-coder"]
 languageCode = "en"
 defaultContentLanguage = "en"
 paginate = 20
@@ -53,7 +53,7 @@ enableInlineShortcodes = true
     # Custom JS
     customJS = []
 
-[social]
+    # Socials
     email = ""
     linkedin = ""
     github = ""
