@@ -68,11 +68,11 @@ steps:
         from_secret: TEST_site_umami_websiteid
       HUGO_PARAMS_UMAMI_JSLOCATION: 
         from_secret: site_umami_jslocation
-      HUGO_SOCIAL_EMAIL: 
+      HUGO_PARAMS_EMAIL: 
         from_secret: site_email_address
-      HUGO_SOCIAL_LINKEDIN: 
+      HUGO_PARAMS_LINKEDIN: 
         from_secret: site_linkedin_url
-      HUGO_SOCIAL_GITHUB: 
+      HUGO_PARAMS_GITHUB: 
         from_secret: site_github_url
       HUGO_RESUME:
         from_secret: nextcloud_path_resume_filename
