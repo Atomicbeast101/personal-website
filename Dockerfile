@@ -36,6 +36,7 @@ COPY layouts/ /src
 COPY resources/ /src
 COPY themes/ /src
 COPY config.toml /src
+RUN dir -s
 
 # Generate static files
 RUN hugo
