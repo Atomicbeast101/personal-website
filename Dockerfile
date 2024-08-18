@@ -24,8 +24,8 @@ RUN mkdir -p /tmp/static
 RUN rclone copy cloud:"/Documents/Job Applications/$CLOUD_PATH_RESUME_FILENAME" /tmp/static/pdf
 RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /tmp/static/images/
 
-# Run image
-FROM hugomods/hugo:nginx
+# Build image #2
+FROM hugomods/hugo:base
 
 # Copy files over
 COPY --from=0 /tmp/static/ /src/
@@ -35,3 +35,7 @@ COPY layouts/ /src
 COPY resources/ /src
 COPY themes/ /src
 COPY config.toml /src
+
+# Run image
+FROM hugomods/hugo:nginx
+COPY /src/public/ /site
