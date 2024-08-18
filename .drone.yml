@@ -46,8 +46,6 @@ steps:
         from_secret: site_linkedin_url
       HUGO_PARAMS_GITHUB: 
         from_secret: site_github_url
-      HUGO_RESUME:
-        from_secret: nextcloud_path_resume_filename
     settings:
       custom_dns: 10.0.2.15
       registry: registry-vps.potatolab.dev
@@ -63,6 +61,21 @@ steps:
         - RCLONE_CONFIG_CLOUD_USER
         - RCLONE_CONFIG_CLOUD_PASS
         - CLOUD_PATH_RESUME_FILENAME
+        - HUGO_BASEURL
+        - HUGO_TITLE
+        - HUGO_PARAMS_AUTHOR
+        - HUGO_PARAMS_DESCRIPTION
+        - HUGO_PARAMS_INFO
+        - HUGO_PARAMS_KEYWORDS
+        - HUGO_PARAMS_AVATARURL
+        - HUGO_PARAMS_COLORSCHEME
+        - HUGO_PARAMS_UMAMI_ENABLED
+        - HUGO_PARAMS_UMAMI_WEBSITEID
+        - HUGO_PARAMS_UMAMI_JSLOCATION
+        - HUGO_PARAMS_EMAIL
+        - HUGO_PARAMS_LINKEDIN
+        - HUGO_PARAMS_GITHUB
+        - HUGO_RESUME
       tags: 
         - ${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}
 
