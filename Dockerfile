@@ -38,8 +38,9 @@ COPY themes/ /src
 COPY config.toml /src
 
 # Generate static files
+RUN git submodule add https://github.com/luizdepra/hugo-coder.git themes/hugo-coder
+RUN git submodule add https://github.com/holehan/hugo-components-matomo.git themes/matomo
 RUN hugo
-
 
 #### Host Static Files via Nginx ####
 FROM nginx
