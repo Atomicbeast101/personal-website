@@ -20,9 +20,9 @@
     hugo_params_umami_enabled: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_ENABLED') }}"
     hugo_params_umami_websiteid: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_WEBSITEID') }}"
     hugo_params_umami_jslocation: "{{ lookup('env', 'HUGO_PARAMS_UMAMI_JSLOCATION') }}"
-    hugo_social_email: "{{ lookup('env', 'HUGO_SOCIAL_EMAIL') }}"
-    hugo_social_linkedin: "{{ lookup('env', 'HUGO_SOCIAL_LINKEDIN') }}"
-    hugo_social_github: "{{ lookup('env', 'HUGO_SOCIAL_GITHUB') }}"
+    hugo_params_email: "{{ lookup('env', 'HUGO_PARAMS_EMAIL') }}"
+    hugo_params_linkedin: "{{ lookup('env', 'HUGO_PARAMS_LINKEDIN') }}"
+    hugo_params_github: "{{ lookup('env', 'HUGO_PARAMS_GITHUB') }}"
     hugo_resume: "{{ lookup('env', 'HUGO_RESUME') }}"
   tasks:
     - name: Install pip packages
