@@ -98,32 +98,35 @@ steps:
     depends_on:
       - Build&Push Docker Image
 
-  - name: Notify Developer of Pipeline Status
-    image: plugins/webhook
-    settings:
-      urls:
-        from_secret: gotify_endpoint
-      content_type: application/json
-      template: >
-        {{#success build.status}}
-          {
-            "priority": 5,
-            "title": "Drone DevOps",
-            "message": "[SUCCESS] Updated TEST personal site!"
-          }
-        {{else}}
-          {
-            "priority": 5,
-            "title": "Drone DevOps",
-            "message": "[FAILED] Unable to update TEST personal site!"
-          }
-        {{/success}}
-    depends_on:
-      - Deploy App to k8s
-    when:
-      status:
-        - success
-        - failure
+  # - name: Notify Developer of Pipeline Status
+  #   image: plugins/webhook
+  #   environment:
+
+  #   settings:
+  #     urls: https://api.pushover.net/1/messages.json
+  #     content_type: application/json
+  #     template: >
+  #       {{#success build.status}}
+  #         {
+  #           "user": "",
+  #           "token": "",
+  #           "title": "Drone DevOps",
+  #           "message": "[SUCCESS] Updated TEST personal site!"
+  #         }
+  #       {{else}}
+  #         {
+  #           "user": "",
+  #           "token": "",
+  #           "title": "Drone DevOps",
+  #           "message": "[FAILED] Unable to update TEST personal site!"
+  #         }
+  #       {{/success}}
+  #   depends_on:
+  #     - Deploy App to k8s
+  #   when:
+  #     status:
+  #       - success
+  #       - failure
 
 ---
 kind: pipeline
@@ -225,29 +228,29 @@ steps:
     depends_on:
       - Build&Push Docker Image
 
-  - name: Notify Developer of Pipeline Status
-    image: plugins/webhook
-    settings:
-      urls:
-        from_secret: gotify_endpoint
-      content_type: application/json
-      template: >
-        {{#success build.status}}
-          {
-            "priority": 5,
-            "title": "Drone DevOps",
-            "message": "[SUCCESS] Updated PROD personal site!"
-          }
-        {{else}}
-          {
-            "priority": 5,
-            "title": "Drone DevOps",
-            "message": "[FAILED] Unable to update PROD personal site!"
-          }
-        {{/success}}
-    depends_on:
-      - Deploy App to k8s
-    when:
-      status:
-        - success
-        - failure
+  # - name: Notify Developer of Pipeline Status
+  #   image: plugins/webhook
+  #   settings:
+  #     urls:
+  #       from_secret: gotify_endpoint
+  #     content_type: application/json
+  #     template: >
+  #       {{#success build.status}}
+  #         {
+  #           "priority": 5,
+  #           "title": "Drone DevOps",
+  #           "message": "[SUCCESS] Updated PROD personal site!"
+  #         }
+  #       {{else}}
+  #         {
+  #           "priority": 5,
+  #           "title": "Drone DevOps",
+  #           "message": "[FAILED] Unable to update PROD personal site!"
+  #         }
+  #       {{/success}}
+  #   depends_on:
+  #     - Deploy App to k8s
+  #   when:
+  #     status:
+  #       - success
+  #       - failure
