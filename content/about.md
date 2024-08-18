@@ -40,7 +40,7 @@ Network/DevOps Engineer with capability to build and automate the deployment/man
 * Deployed and maintained both Windows and Linux servers for various purposes. Ansible is used to deploy and maintain various in-house applications on Linux servers.
 * Deployed applications in Azure cloud using Azure DevOps.
 
-You can find more about my work experience via [LinkedIn]({{< hversion.inline >}}{{ site.Social.linkedin }}{{< /hversion.inline >}}).
+You can find more about my work experience via [LinkedIn]({{< hversion.inline >}}{{ .Site.Params.linkedin }}{{< /hversion.inline >}}).
 
 ## Hobbies
 * Rock Climbing
