@@ -39,7 +39,6 @@ COPY config.toml /src
 
 # Generate static files
 RUN hugo mod init github.com/luizdepra/hugo-coder.git
-RUN hugo mod init github.com/holehan/hugo-components-matomo.git
 RUN hugo
 
 #### Host Static Files via Nginx ####
