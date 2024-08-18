@@ -98,93 +98,32 @@ steps:
     depends_on:
       - Build&Push Docker Image
 
-  - name: Build&Push Docker Image
-    image: plugins/docker
-    environment:
-      RCLONE_CONFIG_CLOUD_TYPE: webdav
-      RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
-      RCLONE_CONFIG_CLOUD_URL: 
-        from_secret: nextcloud_webdev_url
-      RCLONE_CONFIG_CLOUD_USER: 
-        from_secret: nextcloud_user
-      RCLONE_CONFIG_CLOUD_PASS: 
-        from_secret: nextcloud_api_token
-      CLOUD_PATH_RESUME_FILENAME:
-        from_secret: nextcloud_path_resume_filename
-      HUGO_BASEURL: 
-        from_secret: PROD_site_base_url
-      HUGO_TITLE: 
-        from_secret: site_full_name
-      HUGO_PARAMS_AUTHOR: 
-        from_secret: site_full_name
-      HUGO_PARAMS_DESCRIPTION: 
-        from_secret: site_description
-      HUGO_PARAMS_INFO: Network/DevOps Engineer
-      HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
-      HUGO_PARAMS_AVATARURL: images/logo.jpg
-      HUGO_PARAMS_COLORSCHEME: dark
-      HUGO_PARAMS_UMAMI_ENABLED: true
-      HUGO_PARAMS_UMAMI_WEBSITEID: 
-        from_secret: PROD_site_umami_websiteid
-      HUGO_PARAMS_UMAMI_JSLOCATION: 
-        from_secret: site_umami_jslocation
-      HUGO_PARAMS_EMAIL: 
-        from_secret: site_email_address
-      HUGO_PARAMS_LINKEDIN: 
-        from_secret: site_linkedin_url
-      HUGO_PARAMS_GITHUB: 
-        from_secret: site_github_url
+  - name: Notify Developer of Pipeline Status
+    image: plugins/webhook
     settings:
-      custom_dns: 10.0.2.15
-      registry: registry-vps.potatolab.dev
-      repo: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}
-      username: 
-        from_secret: home_registry_username
-      password: 
-        from_secret: home_registry_password
-      build_args_from_env:
-        - RCLONE_CONFIG_CLOUD_TYPE
-        - RCLONE_CONFIG_CLOUD_VENDOR
-        - RCLONE_CONFIG_CLOUD_URL
-        - RCLONE_CONFIG_CLOUD_USER
-        - RCLONE_CONFIG_CLOUD_PASS
-        - CLOUD_PATH_RESUME_FILENAME
-        - HUGO_BASEURL
-        - HUGO_TITLE
-        - HUGO_PARAMS_AUTHOR
-        - HUGO_PARAMS_DESCRIPTION
-        - HUGO_PARAMS_INFO
-        - HUGO_PARAMS_KEYWORDS
-        - HUGO_PARAMS_AVATARURL
-        - HUGO_PARAMS_COLORSCHEME
-        - HUGO_PARAMS_UMAMI_ENABLED
-        - HUGO_PARAMS_UMAMI_WEBSITEID
-        - HUGO_PARAMS_UMAMI_JSLOCATION
-        - HUGO_PARAMS_EMAIL
-        - HUGO_PARAMS_LINKEDIN
-        - HUGO_PARAMS_GITHUB
-        - HUGO_RESUME
-      tags: 
-        - latest
-
-  - name: Deploy App to k8s
-    image: owncloudci/drone-ansible
-    environment:
-      ANSIBLE_SUDO_PASS:
-        from_secret: vps_password
-      APP_NAME: personal-site
-      APP_IMAGE: registry-vps.potatolab.dev/adam/${DRONE_REPO_NAME}:latest
-      APP_HOSTNAME:
-        from_secret: PROD_site_hostname
-      APP_INGRESS: public-ingress
-    settings:
-      playbook: devops/playbook.yml
-      inventory: devops/inventory
-      private_key:
-        from_secret: vps_public_key
-      ssh_extra_args: "-o StrictHostKeyChecking=no"
+      urls:
+        from_secret: gotify_endpoint
+      content_type: application/json
+      template: >
+        {{#success build.status}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[SUCCESS] Updated TEST personal site!"
+          }
+        {{else}}
+          {
+            "priority": 5,
+            "title": "Drone DevOps",
+            "message": "[FAILED] Unable to update TEST personal site!"
+          }
+        {{/success}}
     depends_on:
-      - Build&Push Docker Image
+      - Deploy App to k8s
+    when:
+      status:
+        - success
+        - failure
 
 ---
 kind: pipeline
