@@ -42,7 +42,7 @@ enableInlineShortcodes = true
     maxSeeAlsoItems = 5
 
     # Enable Twemoji
-    enableTwemoji = true
+    enableTwemoji = false
 
     # Custom CSS
     customCSS = []
