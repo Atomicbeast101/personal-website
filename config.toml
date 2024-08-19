@@ -8,7 +8,6 @@ pygmentsStyle = "b2"
 pygmentsCodeFences = true
 pygmentsCodeFencesGuessSyntax = true
 enableInlineShortcodes = true
-enableEmoji = false
 
 [params]
     author = ""
