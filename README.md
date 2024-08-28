@@ -1,4 +1,8 @@
-# Personal Website 
-This repo contains the files to build my personal website using the Hugo framework. It was deployed to a web server using my self-hosted Drone CI/CD DevOps pipeline.
+# Personal Website
 
-Please reach out to [https://adambrodack.com/](https://adambrodack.com/) site if you are interested to see the finished product.
+This repo contains the files to build my personal website using the Hugo framework. It was deployed in both Test and Production environment using my self-hosted Gitea & Drone CI/CD DevOps pipeline.
+
+URL: [https://adambrodack.com/](https://adambrodack.com/)
+
+## DevOps Diagram
+![Diagram](drawing/diagram.jpg)
