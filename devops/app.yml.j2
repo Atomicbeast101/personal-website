@@ -63,11 +63,11 @@ metadata:
   namespace: default
 spec:
   secretName: {{ app_hostname | replace(".", "-") }}-tls
-  dnsNames:
-    - {{ app_hostname }}
   issuerRef:
     name: letsencrypt-cissuer
     kind: ClusterIssuer
+  dnsNames:
+    - {{ app_hostname }}
 
 # Ingress
 ---
