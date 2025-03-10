@@ -95,7 +95,7 @@ jobs:
           message: ✅ Built/Pushed & Tested ${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.REPO_VERSION }}-${{ steps.meta.outputs.BUILD_NUMBER }} app!
 
       - name: Notify Developer of Failure
-        if: needs.release.result == 'success'
+        if: needs.release.result != 'success'
         uses: umahmood/pushover-actions@main
         env:
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
