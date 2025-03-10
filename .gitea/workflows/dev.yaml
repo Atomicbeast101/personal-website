@@ -85,7 +85,7 @@ jobs:
           echo BUILD_NUMBER=$(echo "`date +'%Y%m%d'`.${{ github.run_number }}") >> $GITHUB_OUTPUT
 
       - name: Notify Developer of Success
-        if: needs.release.result == 'success' && needs.tests.result == 'success'
+        if: needs.release.result == 'success'
         uses: umahmood/pushover-actions@main
         env:
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
@@ -95,7 +95,7 @@ jobs:
           message: ✅ Built/Pushed & Tested ${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.REPO_VERSION }}-${{ steps.meta.outputs.BUILD_NUMBER }} app!
 
       - name: Notify Developer of Failure
-        if: needs.release.result != 'success' || needs.tests.result != 'success'
+        if: needs.release.result == 'success'
         uses: umahmood/pushover-actions@main
         env:
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
