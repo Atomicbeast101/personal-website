@@ -47,9 +47,8 @@ jobs:
 
       - name: Build & Push to VPS ACR
         run: |
-          ls -ls
-          pwd
           docker build \
+            --tag ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:dev \
             --build-arg RCLONE_CONFIG_CLOUD_TYPE=$RCLONE_CONFIG_CLOUD_TYPE \
             --build-arg RCLONE_CONFIG_CLOUD_VENDOR=$RCLONE_CONFIG_CLOUD_VENDOR \
             --build-arg RCLONE_CONFIG_CLOUD_URL=$RCLONE_CONFIG_CLOUD_URL \
@@ -70,5 +69,5 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL=$HUGO_PARAMS_EMAIL \
             --build-arg HUGO_PARAMS_LINKEDIN=$HUGO_PARAMS_LINKEDIN \
             --build-arg HUGO_PARAMS_GITHUB=$HUGO_PARAMS_GITHUB \
-            --tag ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:dev .
+            Dockerfile
           docker push ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:dev
