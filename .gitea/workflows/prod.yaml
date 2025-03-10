@@ -68,5 +68,5 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL=$HUGO_PARAMS_EMAIL
             --build-arg HUGO_PARAMS_LINKEDIN=$HUGO_PARAMS_LINKEDIN
             --build-arg HUGO_PARAMS_GITHUB=$HUGO_PARAMS_GITHUB
-            --tag ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest
+            --tag ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest .
           docker push ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest
