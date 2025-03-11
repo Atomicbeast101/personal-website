@@ -5,10 +5,10 @@
   vars:
     timezone: America/Chicago
     k8s_config: /etc/rancher/k3s/k3s.yaml
-    app_name: "{{ lookup('env', 'APP_NAME') }}"
-    app_image: "{{ lookup('env', 'APP_IMAGE') }}"
-    app_hostname: "{{ lookup('env', 'APP_HOSTNAME') }}"
-    app_ingress: "{{ lookup('env', 'APP_INGRESS') }}"
+    app_name: "{{ lookup('env', 'APP_K8S_NAME') }}"
+    app_image: "{{ lookup('env', 'APP_K8S_IMAGE') }}"
+    app_hostname: "{{ lookup('env', 'APP_K8S_HOSTNAME') }}"
+    app_ingress: "{{ lookup('env', 'APP_K8S_INGRESS') }}"
   tasks:
     - name: Install pip packages
       pip:
