@@ -25,9 +25,9 @@ env:
   HUGO_PARAMS_EMAIL: ${{ vars.SITE_EMAIL_ADDRESS }}
   HUGO_PARAMS_LINKEDIN: ${{ vars.SITE_LINKEDIN_URL }}
   HUGO_PARAMS_GITHUB: ${{ vars.SITE_GITHUB_URL }}
+  APP_IMAGE_BASE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}
+  APP_IMAGE_TAG: latest
   APP_K8S_NAME: personal-site
-  APP_K8S_IMAGE_BASE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}
-  APP_K8S_IMAGE_TAG: latest
   APP_K8S_HOSTNAME: ${{ vars.PROD_K8S_HOSTNAME }}
   APP_K8S_INGRESS: public-ingress
 
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build & Push to VPS ACR
         env:
-          APP_K8S_IMAGE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
         run: |
           docker build \
             --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
@@ -75,8 +75,8 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
             --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
             --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
-            --tag $APP_K8S_IMAGE_BASE/$REPO_NAME:$APP_K8S_IMAGE_TAG .
-          docker push $APP_K8S_IMAGE_BASE/$REPO_NAME:$APP_K8S_IMAGE_TAG
+            --tag $APP_IMAGE .
+          docker push $APP_IMAGE
 
   deploy:
     runs-on: ubuntu-latest
@@ -97,7 +97,7 @@ jobs:
       - name: Run Ansible Playbook
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
-          APP_K8S_IMAGE: $APP_K8S_IMAGE_BASE/$REPO_NAME:$APP_K8S_IMAGE_TAG
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
         run: |
           echo ${{ secrets.VPS_PUBLIC_KEY }} > vps_public_key.pkey
           ansible-playbook -i=".gitea/ansible/inventory" .gitea/ansible/playbook.yml --private-key=vps_public_key.pkey --ssh-extra-args="-o StrictHostKeyChecking=no"
