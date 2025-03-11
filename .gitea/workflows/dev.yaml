@@ -106,8 +106,6 @@ jobs:
         id: meta
         run: |
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
-          echo REPO_VERSION=$(echo ${GITHUB_REF} | awk -F"/" '{print $4}') >> $GITHUB_OUTPUT
-          echo BUILD_NUMBER=$(echo "`date +'%Y%m%d'`.${{ github.run_number }}") >> $GITHUB_OUTPUT
 
       - name: Notify Developer of Success
         if: needs.release.result == 'success' && needs.deploy.result == 'success'
@@ -117,7 +115,7 @@ jobs:
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
         with:
           title: Gitea DevOps
-          message: ✅ Built/Pushed & Tested ${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.REPO_VERSION }}-${{ steps.meta.outputs.BUILD_NUMBER }} app!
+          message: ✅ Built/Pushed & Deployed ${{ steps.meta.outputs.REPO_NAME }}:dev app!
 
       - name: Notify Developer of Failure
         if: needs.release.result != 'success' && needs.deploy.result != 'success'
@@ -127,4 +125,4 @@ jobs:
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
         with:
           title: Gitea DevOps
-          message: ❌ Unable to build/push & test ${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.REPO_VERSION }}-${{ steps.meta.outputs.BUILD_NUMBER }} app.
+          message: ❌ Unable to build/push & deploy ${{ steps.meta.outputs.REPO_NAME }}:dev app.
