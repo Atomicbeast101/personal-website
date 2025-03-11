@@ -73,8 +73,8 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
             --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
             --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
-            --tag $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }} .
-          docker push $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
+            --tag $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:$APP_IMAGE_TAG .
+          docker push $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:$APP_IMAGE_TAG
 
   deploy:
     runs-on: ubuntu-latest
@@ -102,8 +102,8 @@ jobs:
         run: |
           echo ${{ secrets.VPS_PUBLIC_KEY }} > vps_public_key.pkey
           chmod 0600 vps_public_key.pkey
-          # ansible-playbook -i=".gitea/ansible/inventory" .gitea/ansible/playbook.yml --private-key=vps_public_key.pkey --ssh-extra-args="-o StrictHostKeyChecking=no"
-          # rm -rf vps_public_key.pkey
+          ansible-playbook -i=".gitea/ansible/inventory" .gitea/ansible/playbook.yml --private-key=vps_public_key.pkey --ssh-extra-args="-o StrictHostKeyChecking=no"
+          rm -rf vps_public_key.pkey
 
   notify:
     runs-on: ubuntu-latest
