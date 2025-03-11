@@ -52,6 +52,7 @@ jobs:
 
       - name: Build & Push to VPS ACR
         run: |
+          echo ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
           docker build \
             --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
             --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
