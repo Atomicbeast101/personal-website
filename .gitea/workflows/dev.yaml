@@ -52,7 +52,6 @@ jobs:
 
       - name: Build & Push to VPS ACR
         run: |
-          echo ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
           docker build \
             --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
             --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
@@ -74,8 +73,8 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
             --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
             --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
-            --tag ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }} .
-          docker push ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
+            --tag $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }} .
+          docker push $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
 
   deploy:
     runs-on: ubuntu-latest

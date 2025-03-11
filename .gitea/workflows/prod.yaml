@@ -51,8 +51,6 @@ jobs:
           password: ${{ secrets.VPS_ACR_PASSWORD }}
 
       - name: Build & Push to VPS ACR
-        env:
-          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
         run: |
           docker build \
             --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
@@ -75,8 +73,8 @@ jobs:
             --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
             --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
             --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
-            --tag $APP_IMAGE .
-          docker push $APP_IMAGE
+            --tag $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }} .
+          docker push $APP_IMAGE_BASE/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
 
   deploy:
     runs-on: ubuntu-latest
