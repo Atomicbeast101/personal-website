@@ -1,0 +1,140 @@
+name: Build/Push App for Development
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  RCLONE_CONFIG_CLOUD_TYPE: webdav
+  RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
+  RCLONE_CONFIG_CLOUD_URL: ${{ vars.NEXTCLOUD_WEBDEV_URL }}
+  RCLONE_CONFIG_CLOUD_USER: ${{ vars.NEXTCLOUD_USER }}
+  RCLONE_CONFIG_CLOUD_PASS: ${{ secrets.NEXTCLOUD_API_TOKEN }}
+  CLOUD_PATH_RESUME_FILENAME: ${{ vars.NEXTCLOUD_PATH_RESUME_FILENAME }}
+  HUGO_BASEURL: ${{ vars.TEST_SITE_BASE_URL }}
+  HUGO_TITLE: ${{ vars.SITE_FULL_NAME }}
+  HUGO_PARAMS_AUTHOR: ${{ vars.SITE_FULL_NAME }}
+  HUGO_PARAMS_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
+  HUGO_PARAMS_INFO: Network/DevOps Engineer
+  HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
+  HUGO_PARAMS_AVATARURL: images/logo.jpg
+  HUGO_PARAMS_COLORSCHEME: dark
+  HUGO_PARAMS_UMAMI_ENABLED: true
+  HUGO_PARAMS_UMAMI_WEBSITEID: ${{ vars.TEST_SITE_UMAMI_WEBSITEID }}
+  HUGO_PARAMS_UMAMI_JSLOCATION: ${{ vars.SITE_UMAMI_JSLOCATION }}
+  HUGO_PARAMS_EMAIL: ${{ vars.SITE_EMAIL_ADDRESS }}
+  HUGO_PARAMS_LINKEDIN: ${{ vars.SITE_LINKEDIN_URL }}
+  HUGO_PARAMS_GITHUB: ${{ vars.SITE_GITHUB_URL }}
+  APP_IMAGE_BASE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}
+  APP_IMAGE_TAG: dev
+  APP_K8S_NAME: personal-site-test
+  APP_K8S_HOSTNAME: ${{ vars.TEST_K8S_HOSTNAME }}
+  APP_K8S_INGRESS: local-ingress
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Meta
+        id: meta
+        run: |
+          echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Login to VPS ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ vars.VPS_ACR_URL }}
+          username: ${{ vars.VPS_ACR_USERNAME }}
+          password: ${{ secrets.VPS_ACR_PASSWORD }}
+
+      - name: Build & Push to VPS ACR
+        env:
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
+        run: |
+          docker build \
+            --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
+            --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
+            --build-arg RCLONE_CONFIG_CLOUD_URL="$RCLONE_CONFIG_CLOUD_URL" \
+            --build-arg RCLONE_CONFIG_CLOUD_USER="$RCLONE_CONFIG_CLOUD_USER" \
+            --build-arg RCLONE_CONFIG_CLOUD_PASS="$RCLONE_CONFIG_CLOUD_PASS" \
+            --build-arg CLOUD_PATH_RESUME_FILENAME="$CLOUD_PATH_RESUME_FILENAME" \
+            --build-arg HUGO_BASEURL="$HUGO_BASEURL" \
+            --build-arg HUGO_TITLE="$HUGO_TITLE" \
+            --build-arg HUGO_PARAMS_AUTHOR="$HUGO_PARAMS_AUTHOR" \
+            --build-arg HUGO_PARAMS_DESCRIPTION="$HUGO_PARAMS_DESCRIPTION" \
+            --build-arg HUGO_PARAMS_INFO="$HUGO_PARAMS_INFO" \
+            --build-arg HUGO_PARAMS_KEYWORDS="$HUGO_PARAMS_KEYWORDS" \
+            --build-arg HUGO_PARAMS_AVATARURL="$HUGO_PARAMS_AVATARURL" \
+            --build-arg HUGO_PARAMS_COLORSCHEME="$HUGO_PARAMS_COLORSCHEME" \
+            --build-arg HUGO_PARAMS_UMAMI_ENABLED="$HUGO_PARAMS_UMAMI_ENABLED" \
+            --build-arg HUGO_PARAMS_UMAMI_WEBSITEID="$HUGO_PARAMS_UMAMI_WEBSITEID" \
+            --build-arg HUGO_PARAMS_UMAMI_JSLOCATION="$HUGO_PARAMS_UMAMI_JSLOCATION" \
+            --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
+            --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
+            --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
+            --tag $APP_IMAGE .
+          docker push $APP_IMAGE
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Get Meta
+        id: meta
+        run: |
+          echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      # https://spacelift.io/blog/github-actions-ansible
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
+        run: |
+          echo "${{ secrets.VPS_PUBLIC_KEY }}" > vps.pkey
+          chmod 0600 vps.pkey
+          ansible-playbook --inventory=.gitea/ansible/inventory --private-key=vps.pkey .gitea/ansible/playbook.yml --ssh-extra-args="-o StrictHostKeyChecking=no"
+          rm -rf vps.pkey
+
+  notify:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: 
+      - release
+      - deploy
+    # uses: adam/gitea-workflows/.gitea/workflows/notify.yaml@main
+    steps:
+      - name: Get Meta
+        id: meta
+        run: |
+          echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+
+      - name: Notify Developer of Success
+        if: needs.release.result == 'success' && needs.deploy.result == 'success'
+        uses: umahmood/pushover-actions@main
+        env:
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+        with:
+          title: Gitea DevOps
+          message: ✅ Built/Pushed & Deployed ${{ steps.meta.outputs.REPO_NAME }}:dev app!
+
+      - name: Notify Developer of Failure
+        if: needs.release.result != 'success' && needs.deploy.result != 'success'
+        uses: umahmood/pushover-actions@main
+        env:
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+        with:
+          title: Gitea DevOps
+          message: ❌ Unable to build/push & deploy ${{ steps.meta.outputs.REPO_NAME }}:dev app.
