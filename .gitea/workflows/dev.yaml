@@ -92,30 +92,16 @@ jobs:
 
       # https://spacelift.io/blog/github-actions-ansible
       - name: Install Dependencies
-        shell: bash
         run: |
           sudo apt update
           sudo apt install -y ansible
-      
-      - name: Add SSH Key
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p /home/runner/.ssh
-          # Replace example.com with the hostname of the machine
-          # you're SSH-ing into
-          ssh-keyscan vps.potato.lab >> /home/runner/.ssh/known_hosts
-          echo "${{ secrets.VPS_PUBLIC_KEY }}" > /home/runner/.ssh/vps
-          chmod 600 /home/runner/.ssh/vps
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
-          ssh-add /home/runner/.ssh/vps
 
       - name: Run Ansible Playbook
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
         run: |
+          echo $SSH_PRIVATE_KEY | base64 -d |tr -d '\r' | ssh-add -
           ansible-playbook -i=".gitea/ansible/inventory" .gitea/ansible/playbook.yml --ssh-extra-args="-o StrictHostKeyChecking=no"
 
   notify:
