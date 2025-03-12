@@ -99,7 +99,7 @@ jobs:
       - name: Run Ansible Playbook
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
-          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
         run: |
           echo "${{ secrets.VPS_PUBLIC_KEY }}" > vps.pkey
           chmod 0600 vps.pkey
