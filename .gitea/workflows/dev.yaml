@@ -97,13 +97,6 @@ jobs:
           sudo apt install -y ansible
 
       - name: Run Ansible Playbook
-        # uses: dawidd6/action-ansible-playbook@v2
-        # with:
-        #   playbook: .gitea/ansible/playbook.yml
-        #   key: ${{ secrets.VPS_PUBLIC_KEY }}
-        #   options: |
-        #     --inventory=.gitea/ansible/inventory
-        #     --ssh-extra-args="-o StrictHostKeyChecking=no"
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ APP_IMAGE_TAG }}

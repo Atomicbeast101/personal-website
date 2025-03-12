@@ -24,6 +24,10 @@
         group: root
         mode: 0755
 
+    - name: Debugging
+      debug:
+        msg: "{{ lookup('env', 'APP_IMAGE') }}"
+
     - name: Upload k8s config
       template:
         src: app.yml.j2
