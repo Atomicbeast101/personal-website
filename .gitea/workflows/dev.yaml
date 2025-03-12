@@ -28,7 +28,7 @@ env:
   APP_IMAGE_BASE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}
   APP_IMAGE_TAG: dev
   APP_K8S_NAME: personal-site-test
-  APP_K8S_HOSTNAME: ${{ vars.DEV_K8S_HOSTNAME }}
+  APP_K8S_HOSTNAME: ${{ vars.TEST_K8S_HOSTNAME }}
   APP_K8S_INGRESS: local-ingress
 
 jobs:
