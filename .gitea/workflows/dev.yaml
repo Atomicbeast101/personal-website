@@ -1,6 +1,5 @@
 name: Build/Push App for Development
 on:
-  workflow_dispatch:
   push:
     branches:
       - dev
