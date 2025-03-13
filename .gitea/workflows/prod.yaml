@@ -1,5 +1,6 @@
 name: Build/Push App for Production
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

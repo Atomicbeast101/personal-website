@@ -1,5 +1,6 @@
 name: Build/Push App for Development
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
@@ -35,7 +36,49 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    uses: ./.gitea/workflows/build_push.yaml
+    steps:
+      - name: Get Meta
+        id: meta
+        run: |
+          echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Login to VPS ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ vars.VPS_ACR_URL }}
+          username: ${{ vars.VPS_ACR_USERNAME }}
+          password: ${{ secrets.VPS_ACR_PASSWORD }}
+
+      - name: Build & Push to VPS ACR
+        env:
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
+        run: |
+          docker build \
+            --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
+            --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
+            --build-arg RCLONE_CONFIG_CLOUD_URL="$RCLONE_CONFIG_CLOUD_URL" \
+            --build-arg RCLONE_CONFIG_CLOUD_USER="$RCLONE_CONFIG_CLOUD_USER" \
+            --build-arg RCLONE_CONFIG_CLOUD_PASS="$RCLONE_CONFIG_CLOUD_PASS" \
+            --build-arg CLOUD_PATH_RESUME_FILENAME="$CLOUD_PATH_RESUME_FILENAME" \
+            --build-arg HUGO_BASEURL="$HUGO_BASEURL" \
+            --build-arg HUGO_TITLE="$HUGO_TITLE" \
+            --build-arg HUGO_PARAMS_AUTHOR="$HUGO_PARAMS_AUTHOR" \
+            --build-arg HUGO_PARAMS_DESCRIPTION="$HUGO_PARAMS_DESCRIPTION" \
+            --build-arg HUGO_PARAMS_INFO="$HUGO_PARAMS_INFO" \
+            --build-arg HUGO_PARAMS_KEYWORDS="$HUGO_PARAMS_KEYWORDS" \
+            --build-arg HUGO_PARAMS_AVATARURL="$HUGO_PARAMS_AVATARURL" \
+            --build-arg HUGO_PARAMS_COLORSCHEME="$HUGO_PARAMS_COLORSCHEME" \
+            --build-arg HUGO_PARAMS_UMAMI_ENABLED="$HUGO_PARAMS_UMAMI_ENABLED" \
+            --build-arg HUGO_PARAMS_UMAMI_WEBSITEID="$HUGO_PARAMS_UMAMI_WEBSITEID" \
+            --build-arg HUGO_PARAMS_UMAMI_JSLOCATION="$HUGO_PARAMS_UMAMI_JSLOCATION" \
+            --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
+            --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
+            --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
+            --tag $APP_IMAGE .
+          docker push $APP_IMAGE
 
   deploy:
     name: Deploy to k8s
