@@ -35,7 +35,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    uses: ./.github/workflows/build_push.yaml
+    uses: ./.gitea/workflows/build_push.yaml
 
   deploy:
     name: Deploy to k8s
