@@ -51,60 +51,33 @@ jobs:
           username: ${{ vars.VPS_ACR_USERNAME }}
           password: ${{ secrets.VPS_ACR_PASSWORD }}
 
-      - name: Build & Push to Local ACR
-        uses: docker/build-push-action@v6
-        with:
-          build-args: |
-            RCLONE_CONFIG_CLOUD_TYPE="${{ env.RCLONE_CONFIG_CLOUD_TYPE }}"
-            RCLONE_CONFIG_CLOUD_VENDOR="${{ env.RCLONE_CONFIG_CLOUD_VENDOR }}"
-            RCLONE_CONFIG_CLOUD_URL="${{ env.RCLONE_CONFIG_CLOUD_URL }}"
-            RCLONE_CONFIG_CLOUD_USER="${{ env.RCLONE_CONFIG_CLOUD_USER }}"
-            RCLONE_CONFIG_CLOUD_PASS="${{ env.RCLONE_CONFIG_CLOUD_PASS }}"
-            CLOUD_PATH_RESUME_FILENAME="${{ env.CLOUD_PATH_RESUME_FILENAME }}"
-            HUGO_BASEURL="${{ env.HUGO_BASEURL }}"
-            HUGO_TITLE="${{ env.HUGO_TITLE }}"
-            HUGO_PARAMS_AUTHOR="${{ env.HUGO_PARAMS_AUTHOR }}"
-            HUGO_PARAMS_DESCRIPTION="${{ env.HUGO_PARAMS_DESCRIPTION }}"
-            HUGO_PARAMS_INFO="${{ env.HUGO_PARAMS_INFO }}"
-            HUGO_PARAMS_KEYWORDS="${{ env.HUGO_PARAMS_KEYWORDS }}"
-            HUGO_PARAMS_AVATARURL="${{ env.HUGO_PARAMS_AVATARURL }}"
-            HUGO_PARAMS_COLORSCHEME="${{ env.HUGO_PARAMS_COLORSCHEME }}"
-            HUGO_PARAMS_UMAMI_ENABLED="${{ env.HUGO_PARAMS_UMAMI_ENABLED }}"
-            HUGO_PARAMS_UMAMI_WEBSITEID="${{ env.HUGO_PARAMS_UMAMI_WEBSITEID }}"
-            HUGO_PARAMS_UMAMI_JSLOCATION="${{ env.HUGO_PARAMS_UMAMI_JSLOCATION }}"
-            HUGO_PARAMS_EMAIL="${{ env.HUGO_PARAMS_EMAIL }}"
-            HUGO_PARAMS_LINKEDIN="${{ env.HUGO_PARAMS_LINKEDIN }}"
-            HUGO_PARAMS_GITHUB="${{ env.HUGO_PARAMS_GITHUB }}"
-          push: true
-          tags: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
-
-      # - name: Build & Push to VPS ACR
-      #   env:
-      #     APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
-      #   run: |
-      #     docker build \
-      #       --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
-      #       --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
-      #       --build-arg RCLONE_CONFIG_CLOUD_URL="$RCLONE_CONFIG_CLOUD_URL" \
-      #       --build-arg RCLONE_CONFIG_CLOUD_USER="$RCLONE_CONFIG_CLOUD_USER" \
-      #       --build-arg RCLONE_CONFIG_CLOUD_PASS="$RCLONE_CONFIG_CLOUD_PASS" \
-      #       --build-arg CLOUD_PATH_RESUME_FILENAME="$CLOUD_PATH_RESUME_FILENAME" \
-      #       --build-arg HUGO_BASEURL="$HUGO_BASEURL" \
-      #       --build-arg HUGO_TITLE="$HUGO_TITLE" \
-      #       --build-arg HUGO_PARAMS_AUTHOR="$HUGO_PARAMS_AUTHOR" \
-      #       --build-arg HUGO_PARAMS_DESCRIPTION="$HUGO_PARAMS_DESCRIPTION" \
-      #       --build-arg HUGO_PARAMS_INFO="$HUGO_PARAMS_INFO" \
-      #       --build-arg HUGO_PARAMS_KEYWORDS="$HUGO_PARAMS_KEYWORDS" \
-      #       --build-arg HUGO_PARAMS_AVATARURL="$HUGO_PARAMS_AVATARURL" \
-      #       --build-arg HUGO_PARAMS_COLORSCHEME="$HUGO_PARAMS_COLORSCHEME" \
-      #       --build-arg HUGO_PARAMS_UMAMI_ENABLED="$HUGO_PARAMS_UMAMI_ENABLED" \
-      #       --build-arg HUGO_PARAMS_UMAMI_WEBSITEID="$HUGO_PARAMS_UMAMI_WEBSITEID" \
-      #       --build-arg HUGO_PARAMS_UMAMI_JSLOCATION="$HUGO_PARAMS_UMAMI_JSLOCATION" \
-      #       --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
-      #       --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
-      #       --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
-      #       --tag $APP_IMAGE .
-      #     docker push $APP_IMAGE
+      - name: Build & Push to VPS ACR
+        env:
+          APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
+        run: |
+          docker build \
+            --build-arg RCLONE_CONFIG_CLOUD_TYPE="$RCLONE_CONFIG_CLOUD_TYPE" \
+            --build-arg RCLONE_CONFIG_CLOUD_VENDOR="$RCLONE_CONFIG_CLOUD_VENDOR" \
+            --build-arg RCLONE_CONFIG_CLOUD_URL="$RCLONE_CONFIG_CLOUD_URL" \
+            --build-arg RCLONE_CONFIG_CLOUD_USER="$RCLONE_CONFIG_CLOUD_USER" \
+            --build-arg RCLONE_CONFIG_CLOUD_PASS="$RCLONE_CONFIG_CLOUD_PASS" \
+            --build-arg CLOUD_PATH_RESUME_FILENAME="$CLOUD_PATH_RESUME_FILENAME" \
+            --build-arg HUGO_BASEURL="$HUGO_BASEURL" \
+            --build-arg HUGO_TITLE="$HUGO_TITLE" \
+            --build-arg HUGO_PARAMS_AUTHOR="$HUGO_PARAMS_AUTHOR" \
+            --build-arg HUGO_PARAMS_DESCRIPTION="$HUGO_PARAMS_DESCRIPTION" \
+            --build-arg HUGO_PARAMS_INFO="$HUGO_PARAMS_INFO" \
+            --build-arg HUGO_PARAMS_KEYWORDS="$HUGO_PARAMS_KEYWORDS" \
+            --build-arg HUGO_PARAMS_AVATARURL="$HUGO_PARAMS_AVATARURL" \
+            --build-arg HUGO_PARAMS_COLORSCHEME="$HUGO_PARAMS_COLORSCHEME" \
+            --build-arg HUGO_PARAMS_UMAMI_ENABLED="$HUGO_PARAMS_UMAMI_ENABLED" \
+            --build-arg HUGO_PARAMS_UMAMI_WEBSITEID="$HUGO_PARAMS_UMAMI_WEBSITEID" \
+            --build-arg HUGO_PARAMS_UMAMI_JSLOCATION="$HUGO_PARAMS_UMAMI_JSLOCATION" \
+            --build-arg HUGO_PARAMS_EMAIL="$HUGO_PARAMS_EMAIL" \
+            --build-arg HUGO_PARAMS_LINKEDIN="$HUGO_PARAMS_LINKEDIN" \
+            --build-arg HUGO_PARAMS_GITHUB="$HUGO_PARAMS_GITHUB" \
+            --tag $APP_IMAGE .
+          docker push $APP_IMAGE
 
   deploy:
     name: Deploy to k8s
