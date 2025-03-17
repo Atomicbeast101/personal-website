@@ -5,6 +5,10 @@ on:
       - dev
 
 env:
+  DOCKER_HOST: "tcp://docker:2376/"
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "/certs/client"
   RCLONE_CONFIG_CLOUD_TYPE: webdav
   RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
   RCLONE_CONFIG_CLOUD_URL: ${{ vars.NEXTCLOUD_WEBDEV_URL }}
@@ -34,7 +38,9 @@ env:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: buildx-ubuntu-latest
+    container:
+      image: gitea/runner-images:ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -56,26 +62,26 @@ jobs:
         with:
           push: true
           build-args: |
-            RCLONE_CONFIG_CLOUD_TYPE="${{ env.RCLONE_CONFIG_CLOUD_TYPE }}"
-            RCLONE_CONFIG_CLOUD_VENDOR="${{ env.RCLONE_CONFIG_CLOUD_VENDOR }}"
-            RCLONE_CONFIG_CLOUD_URL="${{ env.RCLONE_CONFIG_CLOUD_URL }}"
-            RCLONE_CONFIG_CLOUD_USER="${{ env.RCLONE_CONFIG_CLOUD_USER }}"
-            RCLONE_CONFIG_CLOUD_PASS="${{ env.RCLONE_CONFIG_CLOUD_PASS }}"
-            CLOUD_PATH_RESUME_FILENAME="${{ env.CLOUD_PATH_RESUME_FILENAME }}"
-            HUGO_BASEURL="${{ env.HUGO_BASEURL }}"
-            HUGO_TITLE="${{ env.HUGO_TITLE }}"
-            HUGO_PARAMS_AUTHOR="${{ env.HUGO_PARAMS_AUTHOR }}"
-            HUGO_PARAMS_DESCRIPTION="${{ env.HUGO_PARAMS_DESCRIPTION }}"
-            HUGO_PARAMS_INFO="${{ env.HUGO_PARAMS_INFO }}"
-            HUGO_PARAMS_KEYWORDS="${{ env.HUGO_PARAMS_KEYWORDS }}"
-            HUGO_PARAMS_AVATARURL="${{ env.HUGO_PARAMS_AVATARURL }}"
-            HUGO_PARAMS_COLORSCHEME="${{ env.HUGO_PARAMS_COLORSCHEME }}"
-            HUGO_PARAMS_UMAMI_ENABLED="${{ env.HUGO_PARAMS_UMAMI_ENABLED }}"
-            HUGO_PARAMS_UMAMI_WEBSITEID="${{ env.HUGO_PARAMS_UMAMI_WEBSITEID }}"
-            HUGO_PARAMS_UMAMI_JSLOCATION="${{ env.HUGO_PARAMS_UMAMI_JSLOCATION }}"
-            HUGO_PARAMS_EMAIL="${{ env.HUGO_PARAMS_EMAIL }}"
-            HUGO_PARAMS_LINKEDIN="${{ env.HUGO_PARAMS_LINKEDIN }}"
-            HUGO_PARAMS_GITHUB="${{ env.HUGO_PARAMS_GITHUB }}"
+            RCLONE_CONFIG_CLOUD_TYPE=${{ env.RCLONE_CONFIG_CLOUD_TYPE }}
+            RCLONE_CONFIG_CLOUD_VENDOR=${{ env.RCLONE_CONFIG_CLOUD_VENDOR }}
+            RCLONE_CONFIG_CLOUD_URL=${{ env.RCLONE_CONFIG_CLOUD_URL }}
+            RCLONE_CONFIG_CLOUD_USER=${{ env.RCLONE_CONFIG_CLOUD_USER }}
+            RCLONE_CONFIG_CLOUD_PASS=${{ env.RCLONE_CONFIG_CLOUD_PASS }}
+            CLOUD_PATH_RESUME_FILENAME=${{ env.CLOUD_PATH_RESUME_FILENAME }}
+            HUGO_BASEURL=${{ env.HUGO_BASEURL }}
+            HUGO_TITLE=${{ env.HUGO_TITLE }}
+            HUGO_PARAMS_AUTHOR=${{ env.HUGO_PARAMS_AUTHOR }}
+            HUGO_PARAMS_DESCRIPTION=${{ env.HUGO_PARAMS_DESCRIPTION }}
+            HUGO_PARAMS_INFO=${{ env.HUGO_PARAMS_INFO }}
+            HUGO_PARAMS_KEYWORDS=${{ env.HUGO_PARAMS_KEYWORDS }}
+            HUGO_PARAMS_AVATARURL=${{ env.HUGO_PARAMS_AVATARURL }}
+            HUGO_PARAMS_COLORSCHEME=${{ env.HUGO_PARAMS_COLORSCHEME }}
+            HUGO_PARAMS_UMAMI_ENABLED=${{ env.HUGO_PARAMS_UMAMI_ENABLED }}
+            HUGO_PARAMS_UMAMI_WEBSITEID=${{ env.HUGO_PARAMS_UMAMI_WEBSITEID }}
+            HUGO_PARAMS_UMAMI_JSLOCATION=${{ env.HUGO_PARAMS_UMAMI_JSLOCATION }}
+            HUGO_PARAMS_EMAIL=${{ env.HUGO_PARAMS_EMAIL }}
+            HUGO_PARAMS_LINKEDIN=${{ env.HUGO_PARAMS_LINKEDIN }}
+            HUGO_PARAMS_GITHUB=${{ env.HUGO_PARAMS_GITHUB }}
           tags: |
             ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
@@ -103,9 +109,9 @@ jobs:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           APP_IMAGE: ${{ env.APP_IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.APP_IMAGE_TAG }}
         run: |
-          echo "${{ secrets.VPS_PUBLIC_KEY }}" > vps.pkey
+          echo "${{ secrets.VPS_PUBLIC_KEY }} > vps.pkey
           chmod 0600 vps.pkey
-          ansible-playbook --inventory=.gitea/ansible/inventory --private-key=vps.pkey .gitea/ansible/playbook.yml --ssh-extra-args="-o StrictHostKeyChecking=no"
+          ansible-playbook --inventory=.gitea/ansible/inventory --private-key=vps.pkey .gitea/ansible/playbook.yml --ssh-extra-args=-o StrictHostKeyChecking=no"
           rm -rf vps.pkey
 
   notify:
