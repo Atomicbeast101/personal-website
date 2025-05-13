@@ -23,14 +23,14 @@ env:
   HUGO_PARAMS_KEYWORDS: blog,personal,devops,systems,administrator,network,networking
   HUGO_PARAMS_AVATARURL: images/logo.jpg
   HUGO_PARAMS_COLORSCHEME: dark
-  HUGO_PARAMS_UMAMI_ENABLED: true
-  HUGO_PARAMS_UMAMI_WEBSITEID: ${{ vars.PROD_SITE_UMAMI_WEBSITEID }}
-  HUGO_PARAMS_UMAMI_JSLOCATION: ${{ vars.SITE_UMAMI_JSLOCATION }}
+  HUGO_PARAMS_RYBBIT_ENABLED: true
+  HUGO_PARAMS_RYBBIT_WEBSITEID: ${{ vars.PROD_SITE_ANALYTICS_WEBSITEID }}
+  HUGO_PARAMS_RYBBIT_JSLOCATION: ${{ vars.SITE_ANALYTICS_JSLOCATION }}
   HUGO_PARAMS_EMAIL: ${{ vars.SITE_EMAIL_ADDRESS }}
   HUGO_PARAMS_LINKEDIN: ${{ vars.SITE_LINKEDIN_URL }}
   HUGO_PARAMS_GITHUB: ${{ vars.SITE_GITHUB_URL }}
   IMAGE_BASE: ${{ vars.VPS_ACR_URL }}/${{ vars.VPS_ACR_USERNAME }}
-  IMAGE_TAG: latest
+  IMAGE_TAG_ENDING: ""
   APP_K8S_NAME: personal-site
   APP_K8S_HOSTNAME: ${{ vars.PROD_K8S_HOSTNAME }}
   APP_K8S_INGRESS: public-ingress
@@ -49,6 +49,7 @@ jobs:
         id: meta
         run: |
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+          echo DATE_RELEASE=$(echo "`date +'%Y.%m.%d'`") >> $GITHUB_OUTPUT
 
       - name: Login to VPS ACR
         uses: docker/login-action@v3
@@ -76,14 +77,15 @@ jobs:
             HUGO_PARAMS_KEYWORDS=${{ env.HUGO_PARAMS_KEYWORDS }}
             HUGO_PARAMS_AVATARURL=${{ env.HUGO_PARAMS_AVATARURL }}
             HUGO_PARAMS_COLORSCHEME=${{ env.HUGO_PARAMS_COLORSCHEME }}
-            HUGO_PARAMS_UMAMI_ENABLED=${{ env.HUGO_PARAMS_UMAMI_ENABLED }}
-            HUGO_PARAMS_UMAMI_WEBSITEID=${{ env.HUGO_PARAMS_UMAMI_WEBSITEID }}
-            HUGO_PARAMS_UMAMI_JSLOCATION=${{ env.HUGO_PARAMS_UMAMI_JSLOCATION }}
+            HUGO_PARAMS_RYBBIT_ENABLED=${{ env.HUGO_PARAMS_RYBBIT_ENABLED }}
+            HUGO_PARAMS_RYBBIT_WEBSITEID=${{ env.HUGO_PARAMS_RYBBIT_WEBSITEID }}
+            HUGO_PARAMS_RYBBIT_JSLOCATION=${{ env.HUGO_PARAMS_RYBBIT_JSLOCATION }}
             HUGO_PARAMS_EMAIL=${{ env.HUGO_PARAMS_EMAIL }}
             HUGO_PARAMS_LINKEDIN=${{ env.HUGO_PARAMS_LINKEDIN }}
             HUGO_PARAMS_GITHUB=${{ env.HUGO_PARAMS_GITHUB }}
           tags: |
-            ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_RELEASE }}${{ env.IMAGE_TAG_ENDING }}
+            ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:latest${{ env.IMAGE_TAG_ENDING }}
 
   deploy:
     name: Deploy
@@ -94,25 +96,28 @@ jobs:
         id: meta
         run: |
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
+          echo DATE_RELEASE=$(echo "`date +'%Y.%m.%d'`") >> $GITHUB_OUTPUT
 
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # https://spacelift.io/blog/github-actions-ansible
       - name: Install Dependencies
         run: |
           sudo apt update
           sudo apt install -y ansible
 
       - name: Run Ansible Playbook
+        uses: dawidd6/action-ansible-playbook@v3
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
-          APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.IMAGE_TAG }}
-        run: |
-          echo "${{ secrets.VPS_PUBLIC_KEY }}" > vps.pkey
-          chmod 0600 vps.pkey
-          ansible-playbook --inventory=.gitea/ansible/inventory --private-key=vps.pkey .gitea/ansible/playbook.yml --ssh-extra-args="-o StrictHostKeyChecking=no"
-          rm -rf vps.pkey
+          APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_RELEASE }}${{ env.IMAGE_TAG_ENDING }}
+        with:
+          directory: .gitea/ansible/
+          playbook: playbook.yml
+          key: ${{ secrets.VPS_PUBLIC_KEY }}
+          inventory: |
+            [server]
+            vps.potato.lab ansible_port=2222 ansible_user=adam ansible_become=true ansible_become_user=root ansible_python_interpreter=/usr/bin/python3
 
   report:
     name: Report

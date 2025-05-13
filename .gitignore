@@ -3,3 +3,4 @@ static/
 public/
 .hugo_build.lock
 old/
+resources/_gen/assets/scss/coder*

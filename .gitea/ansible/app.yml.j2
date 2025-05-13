@@ -25,6 +25,7 @@ spec:
       containers:
         - name: web-pd
           image: {{ app_image }}
+          imagePullPolicy: Always
           ports:
             - name: web-http-tcp
               containerPort: 80
