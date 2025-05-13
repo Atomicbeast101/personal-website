@@ -88,10 +88,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    container:
-      image: ${{ vars.LOCAL_ACR_URL }}/${{ vars.LOCAL_ACR_USERNAME }}/ubuntu-with-ansible:latest
-      username: ${{ vars.LOCAL_ACR_USERNAME }}
-      password: ${{ secrets.LOCAL_ACR_PASSWORD }}
     needs: release
     steps:
       - name: Get Meta
@@ -101,6 +97,11 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
 
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v3
