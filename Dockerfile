@@ -26,7 +26,7 @@ RUN rclone sync --create-empty-src-dirs cloud:"/Photos/Personal Site Images/" /t
 
 
 #### Build Static Files ####
-FROM hugomods/hugo:git AS hugo
+FROM hugomods/hugo:dart-sass-git-non-root AS hugo
 
 # Arguments
 ARG CLOUD_PATH_RESUME_FILENAME
