@@ -98,6 +98,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v3
         env:
