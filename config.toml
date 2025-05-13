@@ -64,7 +64,7 @@ enableInlineShortcodes = true
   tag = "tags"
   author = "authors"
 
-[params.umami]
+[params.rybbit]
     enabled = false
     websiteId = ""
     jsLocation = ""
