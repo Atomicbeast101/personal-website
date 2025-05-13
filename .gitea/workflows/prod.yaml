@@ -98,20 +98,23 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v3
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ env.IMAGE_TAG }}
         with:
-          directory: .gitea/ansible
+          directory: .gitea/ansible/
           playbook: playbook.yml
           key: ${{ secrets.VPS_PUBLIC_KEY }}
           inventory: |
             [server]
             vps.potato.lab ansible_port=2222 ansible_user=adam ansible_become=true ansible_become_user=root ansible_python_interpreter=/usr/bin/python3
-          options: |
-            --ssh-extra-args=-o StrictHostKeyChecking=no
 
   report:
     name: Report
