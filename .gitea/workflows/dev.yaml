@@ -89,7 +89,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     container:
-      image: adam/ubuntu-with-ansible:latest
+      image: ${{ vars.LOCAL_ACR_URL }}/${{ vars.LOCAL_ACR_USERNAME }}/ubuntu-with-ansible:latest
+      username: ${{ vars.LOCAL_ACR_USERNAME }}
+      password: ${{ secrets.LOCAL_ACR_PASSWORD }}
     needs: release
     steps:
       - name: Get Meta
