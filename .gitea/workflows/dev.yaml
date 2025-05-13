@@ -106,7 +106,6 @@ jobs:
         with:
           directory: .gitea/ansible/
           playbook: playbook.yml
-          directory: ./
           key: ${{ secrets.VPS_PUBLIC_KEY }}
           inventory: |
             [server]
