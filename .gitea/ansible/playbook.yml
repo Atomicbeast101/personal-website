@@ -42,6 +42,3 @@
       ansible.builtin.file:
         path: /root/deployments/app.yml
         state: absent
-
-    - name: Restart deployment to apply new changes
-      command: "kubectl rollout restart deployments/{{ app_name }}"
