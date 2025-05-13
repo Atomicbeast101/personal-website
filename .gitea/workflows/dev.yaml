@@ -88,6 +88,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    container:
+      image: adam/ubuntu-with-ansible:latest
     needs: release
     steps:
       - name: Get Meta
@@ -97,11 +99,6 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
 
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v3
