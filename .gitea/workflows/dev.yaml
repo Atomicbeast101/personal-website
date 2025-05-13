@@ -115,8 +115,6 @@ jobs:
           inventory: |
             [server]
             vps.potato.lab ansible_port=2222 ansible_user=adam ansible_become=true ansible_become_user=root ansible_python_interpreter=/usr/bin/python3
-          options: |
-            --ssh-extra-args=-o StrictHostKeyChecking=no
 
   report:
     name: Report
