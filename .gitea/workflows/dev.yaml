@@ -134,11 +134,12 @@ jobs:
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
 
       - name: Report
-        uses: ${{ vars.LOCAL_ACR_URL }}/${{ vars.LOCAL_ACR_USERNAME }}/workflow-report@dev
+        uses: ${{ vars.LOCAL_ACR_URL }}/${{ vars.LOCAL_ACR_USERNAME }}/workflow-report/.gitea/workflows/prod.yaml@dev
         with:
           success: needs.release.result == 'success' && needs.deploy.result == 'success'
           image_repo: ${{ steps.meta.outputs.REPO_NAME }}
           image_tag: dev
+        secrets: inherit
 
       # - name: Report of Success
       #   if: needs.release.result == 'success' && needs.deploy.result == 'success'
