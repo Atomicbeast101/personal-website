@@ -133,22 +133,29 @@ jobs:
         run: |
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}') >> $GITHUB_OUTPUT
 
-      - name: Report of Success
-        if: needs.release.result == 'success' && needs.deploy.result == 'success'
-        uses: umahmood/pushover-actions@main
-        env:
-          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+      - name: Report
+        uses: ${{ vars.LOCAL_ACR_URL }}/${{ vars.LOCAL_ACR_USERNAME }}/workflow-report@dev
         with:
-          title: Gitea DevOps
-          message: ✅ Built/Pushed & Deployed ${{ steps.meta.outputs.REPO_NAME }}:dev app!
+          success: needs.release.result == 'success' && needs.deploy.result == 'success'
+          image_repo: ${{ steps.meta.outputs.REPO_NAME }}
+          image_tag: dev
 
-      - name: Report of Failure
-        if: needs.release.result != 'success' && needs.deploy.result != 'success'
-        uses: umahmood/pushover-actions@main
-        env:
-          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-        with:
-          title: Gitea DevOps
-          message: ❌ Unable to build/push & deploy ${{ steps.meta.outputs.REPO_NAME }}:dev app.
+      # - name: Report of Success
+      #   if: needs.release.result == 'success' && needs.deploy.result == 'success'
+      #   uses: umahmood/pushover-actions@main
+      #   env:
+      #     PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+      #     PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+      #   with:
+      #     title: Gitea DevOps
+      #     message: ✅ Built/Pushed & Deployed ${{ steps.meta.outputs.REPO_NAME }}:dev app!
+
+      # - name: Report of Failure
+      #   if: needs.release.result != 'success' && needs.deploy.result != 'success'
+      #   uses: umahmood/pushover-actions@main
+      #   env:
+      #     PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+      #     PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+      #   with:
+      #     title: Gitea DevOps
+      #     message: ❌ Unable to build/push & deploy ${{ steps.meta.outputs.REPO_NAME }}:dev app.
