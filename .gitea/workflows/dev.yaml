@@ -5,10 +5,6 @@ on:
       - dev
 
 env:
-  DOCKER_HOST: "tcp://docker:2376/"
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: "/certs/client"
   RCLONE_CONFIG_CLOUD_TYPE: webdav
   RCLONE_CONFIG_CLOUD_VENDOR: nextcloud
   RCLONE_CONFIG_CLOUD_URL: ${{ vars.NEXTCLOUD_WEBDEV_URL }}
@@ -38,12 +34,18 @@ env:
 jobs:
   release:
     name: Release
-    runs-on: buildx-ubuntu-latest
+    runs-on: ubuntu-latest
     container:
-      image: gitea/runner-images:ubuntu-latest
+      image: catthehacker/ubuntu:act-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker BuildX
+        uses: docker/setup-buildx-action@v3
 
       - name: Get Meta
         id: meta
@@ -61,6 +63,8 @@ jobs:
       - name: Build & Push to Local ACR
         uses: docker/build-push-action@v6
         with:
+          platforms: |
+            linux/amd64
           push: true
           build-args: |
             RCLONE_CONFIG_CLOUD_TYPE=${{ env.RCLONE_CONFIG_CLOUD_TYPE }}
