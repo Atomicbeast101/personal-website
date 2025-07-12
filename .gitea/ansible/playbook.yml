@@ -34,6 +34,7 @@
 
     - name: Load app to k8s
       k8s:
+        host: http://localhost:6443
         kubeconfig: "{{ k8s_config }}"
         src: /root/deployments/app.yml
         state: present
