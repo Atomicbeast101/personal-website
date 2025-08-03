@@ -34,12 +34,12 @@
         mode: 0644
 
     - name: gather
-      shell: cat /etc/hostname
-      register: hostname
+      shell: "cat {{ k8s_config }}"
+      register: data
 
     - name: Debug
       debug:
-        msg: "{{ hostname }}"
+        msg: "{{ data }}"
 
     - name: Load app to k8s
       k8s:
