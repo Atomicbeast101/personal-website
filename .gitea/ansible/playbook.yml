@@ -4,6 +4,7 @@
   any_errors_fatal: true
   vars:
     timezone: America/Chicago
+    k8s_host: "{{ lookup('env', 'K8S_HOST') }}"
     k8s_config: /etc/rancher/k3s/k3s.yaml
     app_name: "{{ lookup('env', 'APP_K8S_NAME') }}"
     app_image: "{{ lookup('env', 'APP_IMAGE') }}"
@@ -34,6 +35,7 @@
 
     - name: Load app to k8s
       k8s:
+        host: "{{ k8s_host }}"
         kubeconfig: "{{ k8s_config }}"
         src: /root/deployments/app.yml
         state: present
