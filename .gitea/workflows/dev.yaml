@@ -119,8 +119,7 @@ jobs:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           K8S_HOST: ${{ vars.VPS_K8S_HOST }}
           APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_RELEASE }}${{ env.IMAGE_TAG_ENDING }}
-        options: |
-          -vvvv
+        requirements: .gitea/ansible/requirements.txt
         with:
           directory: .gitea/ansible/
           playbook: playbook.yml
