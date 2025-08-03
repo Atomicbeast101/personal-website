@@ -120,7 +120,7 @@ jobs:
           K8S_HOST: ${{ vars.VPS_K8S_HOST }}
           APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_RELEASE }}${{ env.IMAGE_TAG_ENDING }}
         options: |
-          --verbose
+          -vvvv
         with:
           directory: .gitea/ansible/
           playbook: playbook.yml
