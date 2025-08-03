@@ -114,11 +114,13 @@ jobs:
           sudo apt install -y ansible
 
       - name: Run Ansible Playbook
-        uses: dawidd6/action-ansible-playbook@v3
+        uses: dawidd6/action-ansible-playbook@v4
         env:
           ANSIBLE_SUDO_PASS: ${{ secrets.VPS_SUDO_PASS }}
           K8S_HOST: ${{ vars.VPS_K8S_HOST }}
           APP_IMAGE: ${{ env.IMAGE_BASE }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_RELEASE }}${{ env.IMAGE_TAG_ENDING }}
+        options: |
+          --verbose
         with:
           directory: .gitea/ansible/
           playbook: playbook.yml
