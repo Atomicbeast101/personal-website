@@ -33,6 +33,14 @@
         group: root
         mode: 0644
 
+    - name: gather
+      shell: cat /etc/hostname
+      register: hostname
+
+    - name: Debug
+      debug:
+        msg: "{{ hostname }}"
+
     - name: Load app to k8s
       k8s:
         host: "{{ k8s_host }}"
