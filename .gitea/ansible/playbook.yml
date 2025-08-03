@@ -34,6 +34,7 @@
 
     - name: Load app to k8s
       k8s:
+        kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
         src: /root/deployments/app.yml
         state: present
 
